@@ -1,5 +1,6 @@
 using FPVDevelopment.Components;
 using FPVDevelopment.Components.Data;
+using FPVDevelopment.Components.Services;
 using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddDbContextFactory<FPVDbContext>((DbContextOptionsBuilder options) => 
     options.UseSqlServer(connectionString));
+builder.Services.AddSingleton<MapService>();
 
 WebApplication app = builder.Build();
 
