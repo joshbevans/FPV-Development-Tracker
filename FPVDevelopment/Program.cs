@@ -1,12 +1,18 @@
 using FPVDevelopment.Components;
+using FPVDevelopment.Components.Data;
+using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+string connectionString = builder.Configuration.GetConnectionString("Default")
+    ?? throw new NullReferenceException("No connection string");
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddDbContextFactory<FPVDbContext>((DbContextOptionsBuilder options) => 
+    options.UseSqlServer(connectionString));
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
