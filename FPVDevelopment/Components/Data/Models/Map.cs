@@ -7,9 +7,10 @@ namespace FPVDevelopment.Components.Data.Models
     {
         [Key]
         public int MapID { get; set; }
-
+        [StringLength(50)]
         public string MapName { get; set; }
-
         public MapDifficulty MapDifficulty { get; set; }
+
+        public ICollection<CompletedRun> CompletedRuns { get; set; } = new List<CompletedRun>();
     }
 }
