@@ -21,6 +21,7 @@ namespace FPVDevelopment.Components.Services
             using (FPVDbContext context = _dbContextFactory.CreateDbContext())
             {
                 context.Maps.Add(map);
+                context.SaveChanges();
             }
         }
     }

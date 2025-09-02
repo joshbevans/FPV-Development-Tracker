@@ -3,6 +3,7 @@
 @using FPVDevelopment.Components.Data.Models
 @using static FPVDevelopment.Components.Globals.Enums
 @inject MapService mapService;
+@rendermode InteractiveServer
 
 <h1>Add a new map to the database.</h1>
 
@@ -21,14 +22,14 @@
     </InputSelect>
     <br /><br />
 
-    <button type="submit" class="btn-primary">Add Map</button>
+    <button type="submit" class="btn-primary" disabled="@_isSubmitDisabled">Add Map</button>
 </EditForm>
 
 @code {
     Map map = new Map();
 
-    // private bool _isSubmitDisabled =>
-    //     string.IsNullOrWhiteSpace(map.MapName);
+    private bool _isSubmitDisabled =>
+        string.IsNullOrWhiteSpace(map.Name);
 
     public void HandleSubmit(EditContext editContext)
     {
