@@ -4,6 +4,7 @@
 @using static FPVDevelopment.Components.Globals.Enums
 @inject DroneService droneService;
 @inject ToastService toastService
+@inject CurrentUser currentUser;
 @rendermode InteractiveServer
 
 <h1>Add a new drone to the database.</h1>
@@ -40,8 +41,16 @@
         string.IsNullOrWhiteSpace(drone.Name);
 
     private async Task HandleSubmit(EditContext editContext)
-    {            
-        Drone newDrone = (Drone)editContext.Model;
+    {
+        var newDrone = new Drone
+        {
+            Name = drone.Name,
+            Size = drone.Size
+        };
+        
+        if (isCustom)
+            newDrone.UsedID = currentUser.User.ID;
+        
         droneService.AddDrone(newDrone);
         toastService.ShowSuccess("Drone Added!", 5);
     }

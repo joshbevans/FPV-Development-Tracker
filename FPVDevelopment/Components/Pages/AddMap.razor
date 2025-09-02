@@ -34,7 +34,12 @@
 
     private async Task HandleSubmit(EditContext editContext)
     {
-        Map newMap = (Map)editContext.Model;
+        var newMap = new Map
+        {
+            Name = map.Name,
+            Difficulty = map.Difficulty
+        };
+        
         await mapService.AddMap(newMap);
         toastService.ShowSuccess("Map Added!", 5);
     }
