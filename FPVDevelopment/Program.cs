@@ -13,6 +13,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddDbContextFactory<FPVDbContext>((DbContextOptionsBuilder options) => 
     options.UseSqlServer(connectionString));
 builder.Services.AddSingleton<MapService>();
+builder.Services.AddSingleton<DroneService>();
 
 WebApplication app = builder.Build();
 

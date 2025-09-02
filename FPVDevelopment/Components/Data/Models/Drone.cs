@@ -9,7 +9,7 @@ namespace FPVDevelopment.Components.Data.Models
         public int ID { get; set; }
         [StringLength(20)]
         public string Name { get; set; }
-        public DroneSize Size { get; set; }
+        public DroneSize Size { get; set; } = DroneSize.SevenInch;
 
         public ICollection<CompletedRun> CompletedRuns {  get; set; } = new List<CompletedRun>();
     }
