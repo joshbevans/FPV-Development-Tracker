@@ -1,6 +1,5 @@
 ﻿@page "/"
 @using FPVDevelopment.Components.Data.Classes
-@using FPVDevelopment.Components.Data.Models
 @inject UserService userService
 @inject CurrentUser currentUser
 @inject PreloadService preloadService
@@ -28,5 +27,6 @@ User login will go here, for now it just logs into a hard-coded user
     {
         currentUser.SetCurrentUser(await userService.Login("user", "pass"));
         await preloadService.PreloadDataAsync(currentUser.User);
+        
     }
 }
