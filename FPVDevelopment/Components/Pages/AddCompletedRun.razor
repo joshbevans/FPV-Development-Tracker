@@ -42,10 +42,6 @@
     <input type="number" @bind="milliseconds">
     <br /><br />
 
-    <label for="CrashInput">Number of Crashes / Resets: </label>
-    <InputNumber id="CrashInput" @bind-Value="@completedRun.CrashCount"></InputNumber>
-    <br /><br />
-
     <button type="submit" class="btn-outline-primary" disabled="@_isSubmitDisabled">Add Completed Run</button>
 </EditForm>
 
