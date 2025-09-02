@@ -2,6 +2,7 @@
 @using FPVDevelopment.Components.Data.Classes
 @inject UserService userService
 @inject CurrentUser currentUser
+@inject ToastService toastService
 @inject PreloadService preloadService
 @rendermode InteractiveServer
 
@@ -27,6 +28,6 @@ User login will go here, for now it just logs into a hard-coded user
     {
         currentUser.SetCurrentUser(await userService.Login("user", "pass"));
         await preloadService.PreloadDataAsync(currentUser.User);
-        
+        toastService.ShowSuccess("test 1", 5);
     }
 }
