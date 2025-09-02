@@ -9,7 +9,6 @@ namespace FPVDevelopment.Components.Data.Models
         public int ID { get; set; }
         public TimeSpan? Time { get; set; }
         public DateTime Date { get; set; }
-        public int? CrashCount { get; set; } = 0;
         public int UserID { get; set; }
         public int MapID { get; set; }
         public int DroneID { get; set; }
