@@ -13,13 +13,15 @@ namespace FPVDevelopment.Components.Services
             _dbContextFactory = dbContextFactory;
         }
 
-        public void AddCompletedRun(CompletedRun completedRun)
+        public void AddCompletedRun(CompletedRun completedRun, User currentUser)
         {
             if (completedRun is null)
                 throw new ArgumentNullException(nameof(completedRun));
 
             using (FPVDbContext context = _dbContextFactory.CreateDbContext())
             {
+                completedRun.User = currentUser;
+                completedRun.Date = DateTime.Now;
                 context.CompletedRuns.Add(completedRun);
                 context.SaveChanges();
             }

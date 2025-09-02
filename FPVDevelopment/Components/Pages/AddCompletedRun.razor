@@ -1,41 +1,70 @@
 ﻿@page "/AddCompletedRun"
-@using FPVDevelopment.Components.Services
+@using FPVDevelopment.Components.Data.Classes
 @using FPVDevelopment.Components.Data.Models
+@using FPVDevelopment.Components.Globals
 @using static FPVDevelopment.Components.Globals.Enums
 @inject CompletedRunService completedRunService;
+@inject MapService mapService;
+@inject DroneService droneService;
+@inject CurrentUser currentUser;
 @rendermode InteractiveServer
 
 <h1>Add a new map to the database.</h1>
 
 <EditForm FormName="AddCompletedRunForm" Model="@completedRun" OnSubmit="HandleSubmit">
-    @* <label for="NameInput">Drone Name: </label>
-    <InputText id="NameInput"
-               @bind-Value="@completedRun.Name" />
-    <br /><br />
-
-    <label for="DifficultyInput">Drone Size: </label>
-    <InputSelect id="DifficultyInput" @bind-Value="@completedRun.Size">
-        @foreach (DroneSize size in Enum.GetValues(typeof(DroneSize)))
+    <label for="MapInput">Select Map: </label>
+    <InputSelect id="MapInput" @bind-Value="@completedRun.Map">
+        @foreach (Map map in mapList)
         {
-            string displayTag = GetEnumDescription(size);
-            <option value="@size">@displayTag</option>
+            string displayTag = $"{map.Name} ({map.Difficulty})";
+            <option value="@map.Name">@displayTag</option>
         }
     </InputSelect>
-    <br /><br /> *@
+    <br /><br />
+
+    <label for="DroneInput">Select Drone: </label>
+    <InputSelect id="DroneInput" @bind-Value="@completedRun.Drone">
+        @foreach (Drone drone in droneList)
+        {
+            string displayTag = $"{drone.Name} ({Enums.GetEnumDescription(drone.Size)})";
+            <option value="@drone.Name">@displayTag</option>
+        }
+    </InputSelect>
+    <br /><br />
 
     <button type="submit" class="btn-primary" disabled="@_isSubmitDisabled">Add Map</button>
 </EditForm>
 
 @code {
+    List<Map> mapList = new List<Map>();
+    List<Drone> droneList = new List<Drone>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        mapList = await mapService.GetMaps();
+        droneList = await droneService.GetDrones();
+        currentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
+    }
+
+    private void OnCurrentUserChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        currentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
+    }
+
     CompletedRun completedRun = new CompletedRun();
 
     private bool _isSubmitDisabled =>
-        false;
+        completedRun.Drone is null ||
+        completedRun.Map is null;
 
     public void HandleSubmit(EditContext editContext)
     {
         CompletedRun newCompletedRun = (CompletedRun)editContext.Model;
-        newCompletedRun.Date = DateTime.Now;
-        completedRunService.AddCompletedRun(newCompletedRun);
+        completedRunService.AddCompletedRun(newCompletedRun, currentUser.User);
     }
 }
