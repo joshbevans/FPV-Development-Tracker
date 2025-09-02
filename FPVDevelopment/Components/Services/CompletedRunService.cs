@@ -13,23 +13,23 @@ namespace FPVDevelopment.Components.Services
             _dbContextFactory = dbContextFactory;
         }
 
-        public void AddCompletedRun(CompletedRun completedRun, User currentUser)
+        public async Task AddCompletedRun(CompletedRun completedRun, User currentUser)
         {
             if (completedRun is null)
                 throw new ArgumentNullException(nameof(completedRun));
 
-            using (FPVDbContext context = _dbContextFactory.CreateDbContext())
+            using (FPVDbContext context = await _dbContextFactory.CreateDbContextAsync())
             {
                 completedRun.Map = context.Maps
                     .First(map => map.ID == completedRun.MapID);
                 completedRun.UserID = currentUser.ID;
                 completedRun.Date = DateTime.Now;
                 context.CompletedRuns.Add(completedRun);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
 
-        public void GetCompletedRuns(User user)
+        public async Task GetCompletedRuns(User user)
         {
 
         }

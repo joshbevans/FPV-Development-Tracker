@@ -3,7 +3,7 @@
 @using FPVDevelopment.Components.Data.Models
 @using static FPVDevelopment.Components.Globals.Enums
 @inject DroneService droneService;
-@inject CurrentUser currentUser;
+@inject ToastService toastService
 @rendermode InteractiveServer
 
 <h1>Add a new drone to the database.</h1>
@@ -39,9 +39,10 @@
     private bool _isSubmitDisabled =>
         string.IsNullOrWhiteSpace(drone.Name);
 
-    private void HandleSubmit(EditContext editContext)
+    private async Task HandleSubmit(EditContext editContext)
     {            
         Drone newDrone = (Drone)editContext.Model;
         droneService.AddDrone(newDrone);
+        toastService.ShowSuccess("Drone Added!", 5);
     }
 }

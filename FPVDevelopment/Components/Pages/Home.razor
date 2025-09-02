@@ -1,8 +1,8 @@
 ﻿@page "/"
 @using FPVDevelopment.Components.Data.Classes
-@using FPVDevelopment.Components.Data.Models
 @inject UserService userService
 @inject CurrentUser currentUser
+@inject ToastService toastService
 @inject PreloadService preloadService
 @rendermode InteractiveServer
 
@@ -27,6 +27,14 @@ User login will go here, for now it just logs into a hard-coded user
     private async Task HandleLoginUser()
     {
         currentUser.SetCurrentUser(await userService.Login("user", "pass"));
-        await preloadService.PreloadDataAsync(currentUser.User);
+        if (currentUser is not null)
+        {
+            toastService.ShowSuccess("Login Successful!", 5);
+            await preloadService.PreloadDataAsync(currentUser.User);
+        }
+        else
+        {
+            toastService.ShowError("Login Failed!", 5);
+        }
     }
 }

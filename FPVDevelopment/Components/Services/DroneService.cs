@@ -13,15 +13,15 @@ namespace FPVDevelopment.Components.Services
             _dbContextFactory = dbContextFactory;
         }
 
-        public void AddDrone(Drone drone)
+        public async Task AddDrone(Drone drone)
         {
             if (drone is null)
                 throw new ArgumentNullException(nameof(drone));
 
-            using (FPVDbContext context = _dbContextFactory.CreateDbContext())
+            using (FPVDbContext context = await _dbContextFactory.CreateDbContextAsync())
             {
                 context.Drones.Add(drone);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
 

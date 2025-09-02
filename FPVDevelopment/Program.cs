@@ -18,6 +18,7 @@ builder.Services.AddSingleton<DroneService>();
 builder.Services.AddSingleton<MapService>();
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<PreloadService>();
+builder.Services.AddSingleton<ToastService>();
 builder.Services.AddScoped<CurrentUser>();
 
 WebApplication app = builder.Build();
