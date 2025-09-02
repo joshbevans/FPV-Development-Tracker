@@ -1,0 +1,41 @@
+﻿@page "/AddCompletedRun"
+@using FPVDevelopment.Components.Services
+@using FPVDevelopment.Components.Data.Models
+@using static FPVDevelopment.Components.Globals.Enums
+@inject CompletedRunService completedRunService;
+@rendermode InteractiveServer
+
+<h1>Add a new map to the database.</h1>
+
+<EditForm FormName="AddCompletedRunForm" Model="@completedRun" OnSubmit="HandleSubmit">
+    @* <label for="NameInput">Drone Name: </label>
+    <InputText id="NameInput"
+               @bind-Value="@completedRun.Name" />
+    <br /><br />
+
+    <label for="DifficultyInput">Drone Size: </label>
+    <InputSelect id="DifficultyInput" @bind-Value="@completedRun.Size">
+        @foreach (DroneSize size in Enum.GetValues(typeof(DroneSize)))
+        {
+            string displayTag = GetEnumDescription(size);
+            <option value="@size">@displayTag</option>
+        }
+    </InputSelect>
+    <br /><br /> *@
+
+    <button type="submit" class="btn-primary" disabled="@_isSubmitDisabled">Add Map</button>
+</EditForm>
+
+@code {
+    CompletedRun completedRun = new CompletedRun();
+
+    private bool _isSubmitDisabled =>
+        false;
+
+    public void HandleSubmit(EditContext editContext)
+    {
+        CompletedRun newCompletedRun = (CompletedRun)editContext.Model;
+        newCompletedRun.Date = DateTime.Now;
+        completedRunService.AddCompletedRun(newCompletedRun);
+    }
+}
