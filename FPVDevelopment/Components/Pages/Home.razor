@@ -3,6 +3,7 @@
 @using FPVDevelopment.Components.Data.Models
 @inject UserService userService
 @inject CurrentUser currentUser
+@inject PreloadService preloadService
 @rendermode InteractiveServer
 
 <PageTitle>Account</PageTitle>
@@ -25,6 +26,7 @@ User login will go here, for now it just logs into a hard-coded user
 @code {
     private async Task HandleLoginUser()
     {
-         currentUser.SetCurrentUser(await userService.Login("user", "pass"));
+        currentUser.SetCurrentUser(await userService.Login("user", "pass"));
+        await preloadService.PreloadDataAsync(currentUser.User);
     }
 }

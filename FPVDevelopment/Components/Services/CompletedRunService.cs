@@ -20,7 +20,9 @@ namespace FPVDevelopment.Components.Services
 
             using (FPVDbContext context = _dbContextFactory.CreateDbContext())
             {
-                completedRun.User = currentUser;
+                completedRun.Map = context.Maps
+                    .First(map => map.ID == completedRun.MapID);
+                completedRun.UserID = currentUser.ID;
                 completedRun.Date = DateTime.Now;
                 context.CompletedRuns.Add(completedRun);
                 context.SaveChanges();

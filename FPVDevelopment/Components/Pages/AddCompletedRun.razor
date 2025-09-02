@@ -2,6 +2,7 @@
 @using FPVDevelopment.Components.Data.Classes
 @using FPVDevelopment.Components.Data.Models
 @using FPVDevelopment.Components.Globals
+@using Microsoft.EntityFrameworkCore
 @using static FPVDevelopment.Components.Globals.Enums
 @inject CompletedRunService completedRunService;
 @inject MapService mapService;
@@ -13,21 +14,23 @@
 
 <EditForm FormName="AddCompletedRunForm" Model="@completedRun" OnSubmit="HandleSubmit">
     <label for="MapInput">Select Map: </label>
-    <InputSelect id="MapInput" @bind-Value="@completedRun.Map">
-        @foreach (Map map in mapList)
+    <InputSelect id="MapInput" @bind-Value="completedRun.MapID">
+        <option value="">-- Select a Map --</option>
+        @foreach (var map in mapList)
         {
             string displayTag = $"{map.Name} ({map.Difficulty})";
-            <option value="@map">@displayTag</option>
+            <option value="@map.ID">@displayTag</option>
         }
     </InputSelect>
     <br /><br />
 
     <label for="DroneInput">Select Drone: </label>
-    <InputSelect id="DroneInput" @bind-Value="@completedRun.Drone">
-        @foreach (Drone drone in droneList)
+    <InputSelect id="DroneInput" @bind-Value="completedRun.DroneID">
+        <option value="">-- Select a Drone --</option>
+        @foreach (var drone in droneList)
         {
             string displayTag = $"{drone.Name} ({Enums.GetEnumDescription(drone.Size)})";
-            <option value="@drone">@displayTag</option>
+            <option value="@drone.ID">@displayTag</option>
         }
     </InputSelect>
     <br /><br />
@@ -47,8 +50,8 @@
 
 @code {
     CompletedRun completedRun = new CompletedRun();
-    List<Map> mapList = new List<Map>();
-    List<Drone> droneList = new List<Drone>();
+    IList<Map> mapList = [];
+    IList<Drone> droneList = [];
     private int minutes;
     private int seconds;
     private int milliseconds;
@@ -56,8 +59,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        mapList = await mapService.GetMaps();
-        droneList = await droneService.GetDrones();
+        mapList = await  mapService.GetMaps();
+        droneList = await droneService.GetDrones(currentUser.User);
         currentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
     }
 
@@ -72,10 +75,12 @@
     }
 
     private bool _isSubmitDisabled =>
-        false;
-        // completedRun.Drone is null ||
-        // completedRun.Map is null ||
-        // completedRun.CrashCount is null;
+        completedRun.MapID is 0 ||
+        completedRun.DroneID is 0 ||
+        string.IsNullOrWhiteSpace(minutes.ToString()) ||
+        string.IsNullOrWhiteSpace(seconds.ToString()) ||
+        string.IsNullOrWhiteSpace(milliseconds.ToString());
+
 
     public void HandleSubmit(EditContext editContext)
     {
