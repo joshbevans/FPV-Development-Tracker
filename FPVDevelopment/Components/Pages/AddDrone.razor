@@ -5,8 +5,8 @@
 @inject DroneService droneService;
 @rendermode InteractiveServer
 
-<h1>Add a new map to the database.</h1>
-
+<h1>Add a new drone to the database.</h1>
+<br />
 <EditForm FormName="AddDroneForm" Model="@drone" OnSubmit="HandleSubmit">
     <label for="NameInput">Drone Name: </label>
     <InputText id="NameInput"
@@ -32,7 +32,7 @@
     private bool _isSubmitDisabled =>
         string.IsNullOrWhiteSpace(drone.Name);
 
-    public void HandleSubmit(EditContext editContext)
+    private void HandleSubmit(EditContext editContext)
     {
         Drone newDrone = (Drone)editContext.Model;
         droneService.AddDrone(newDrone);

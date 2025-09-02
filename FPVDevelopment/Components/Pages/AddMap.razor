@@ -6,7 +6,7 @@
 @rendermode InteractiveServer
 
 <h1>Add a new map to the database.</h1>
-
+<br />
 <EditForm FormName="AddMapForm" Model="@map" OnSubmit="HandleSubmit">
     <label for="NameInput">Map Name: </label>
     <InputText id="NameInput"
@@ -31,7 +31,7 @@
     private bool _isSubmitDisabled =>
         string.IsNullOrWhiteSpace(map.Name);
 
-    public void HandleSubmit(EditContext editContext)
+    private void HandleSubmit(EditContext editContext)
     {
         Map newMap = (Map)editContext.Model;
         mapService.AddMap(newMap);
