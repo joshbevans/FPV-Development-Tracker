@@ -1,0 +1,40 @@
+﻿@page "/AddDrone"
+@using FPVDevelopment.Components.Services
+@using FPVDevelopment.Components.Data.Models
+@using static FPVDevelopment.Components.Globals.Enums
+@inject DroneService droneService;
+@rendermode InteractiveServer
+
+<h1>Add a new map to the database.</h1>
+
+<EditForm FormName="AddDroneForm" Model="@drone" OnSubmit="HandleSubmit">
+    <label for="NameInput">Drone Name: </label>
+    <InputText id="NameInput"
+               @bind-Value="@drone.Name" />
+    <br /><br />
+
+    <label for="DifficultyInput">Drone Size: </label>
+    <InputSelect id="DifficultyInput" @bind-Value="@drone.Size">
+        @foreach (DroneSize size in Enum.GetValues(typeof(DroneSize)))
+        {
+            string displayTag = GetEnumDescription(size);
+            <option value="@size">@displayTag</option>
+        }
+    </InputSelect>
+    <br /><br />
+
+    <button type="submit" class="btn-primary" disabled="@_isSubmitDisabled">Add Map</button>
+</EditForm>
+
+@code {
+    Drone drone = new Drone();
+
+    private bool _isSubmitDisabled =>
+        string.IsNullOrWhiteSpace(drone.Name);
+
+    public void HandleSubmit(EditContext editContext)
+    {
+        Drone newDrone = (Drone)editContext.Model;
+        droneService.AddDrone(newDrone);
+    }
+}
