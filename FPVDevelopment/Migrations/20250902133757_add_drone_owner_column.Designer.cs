@@ -4,6 +4,7 @@ using FPVDevelopment.Components.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FPVDevelopment.Migrations
 {
     [DbContext(typeof(FPVDbContext))]
-    partial class FPVDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250902133757_add_drone_owner_column")]
+    partial class add_drone_owner_column
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,9 +78,6 @@ namespace FPVDevelopment.Migrations
                     b.Property<int>("Size")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UsedID")
-                        .HasColumnType("int");
-
                     b.Property<int?>("UserID")
                         .HasColumnType("int");
 
@@ -90,11 +90,11 @@ namespace FPVDevelopment.Migrations
 
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Map", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("MapID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MapID"));
 
                     b.Property<int>("Difficulty")
                         .HasColumnType("int");
@@ -104,7 +104,7 @@ namespace FPVDevelopment.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.HasKey("ID");
+                    b.HasKey("MapID");
 
                     b.ToTable("Maps");
                 });

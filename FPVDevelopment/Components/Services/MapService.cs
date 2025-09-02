@@ -24,5 +24,13 @@ namespace FPVDevelopment.Components.Services
                 context.SaveChanges();
             }
         }
+
+        public async Task<IList<Map>> GetMaps()
+        {
+            using (FPVDbContext context = _dbContextFactory.CreateDbContext())
+            {
+                return await context.Maps.ToListAsync();
+            }
+        }
     }
 }

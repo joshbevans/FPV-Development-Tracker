@@ -13,13 +13,17 @@ namespace FPVDevelopment.Components.Services
             _dbContextFactory = dbContextFactory;
         }
 
-        public void AddCompletedRun(CompletedRun completedRun)
+        public void AddCompletedRun(CompletedRun completedRun, User currentUser)
         {
             if (completedRun is null)
                 throw new ArgumentNullException(nameof(completedRun));
 
             using (FPVDbContext context = _dbContextFactory.CreateDbContext())
             {
+                completedRun.Map = context.Maps
+                    .First(map => map.ID == completedRun.MapID);
+                completedRun.UserID = currentUser.ID;
+                completedRun.Date = DateTime.Now;
                 context.CompletedRuns.Add(completedRun);
                 context.SaveChanges();
             }

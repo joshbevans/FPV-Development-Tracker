@@ -24,5 +24,15 @@ namespace FPVDevelopment.Components.Services
                 context.SaveChanges();
             }
         }
+
+        public async Task<IList<Drone>> GetDrones(User user)
+        {
+            using (FPVDbContext context = _dbContextFactory.CreateDbContext())
+            {
+                return await context.Drones
+                    .Where(x => x.User == null || x.User == user)
+                    .ToListAsync();
+            }
+        }
     }
 }
