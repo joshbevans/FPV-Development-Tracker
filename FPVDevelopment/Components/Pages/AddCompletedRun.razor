@@ -8,6 +8,7 @@
 @inject MapService mapService;
 @inject DroneService droneService;
 @inject CurrentUser currentUser;
+@inject ToastService toastService
 @rendermode InteractiveServer
 
 <h1>Add a completed run to the database.</h1>
@@ -87,5 +88,6 @@
         CompletedRun newCompletedRun = (CompletedRun)editContext.Model;
         newCompletedRun.Time = CreateTimeSpan(); 
         completedRunService.AddCompletedRun(newCompletedRun, currentUser.User);
+        toastService.ShowSuccess("Completed Run Added!", 5);
     }
 }

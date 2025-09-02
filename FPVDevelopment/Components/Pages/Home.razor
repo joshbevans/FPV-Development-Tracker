@@ -27,7 +27,14 @@ User login will go here, for now it just logs into a hard-coded user
     private async Task HandleLoginUser()
     {
         currentUser.SetCurrentUser(await userService.Login("user", "pass"));
-        await preloadService.PreloadDataAsync(currentUser.User);
-        toastService.ShowSuccess("test 1", 5);
+        if (currentUser is not null)
+        {
+            toastService.ShowSuccess("Login Successful!", 5);
+            await preloadService.PreloadDataAsync(currentUser.User);
+        }
+        else
+        {
+            toastService.ShowError("Login Failed!", 5);
+        }
     }
 }

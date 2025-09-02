@@ -13,15 +13,15 @@ namespace FPVDevelopment.Components.Services
             _dbContextFactory = dbContextFactory;
         }
 
-        public void AddMap(Map map)
+        public async Task AddMap(Map map)
         {
             if (map is null)
                 throw new ArgumentNullException(nameof(map));
 
-            using (FPVDbContext context = _dbContextFactory.CreateDbContext())
+            using (FPVDbContext context = await _dbContextFactory.CreateDbContextAsync())
             {
                 context.Maps.Add(map);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
 
