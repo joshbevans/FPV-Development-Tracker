@@ -8,8 +8,8 @@ namespace FPVDevelopment.Components.Data.Models
         [Key]
         public int MapID { get; set; }
         [StringLength(50)]
-        public string MapName { get; set; }
-        public MapDifficulty MapDifficulty { get; set; }
+        public string Name { get; set; }
+        public MapDifficulty Difficulty { get; set; } = MapDifficulty.Basic;
 
         public ICollection<CompletedRun> CompletedRuns { get; set; } = new List<CompletedRun>();
     }

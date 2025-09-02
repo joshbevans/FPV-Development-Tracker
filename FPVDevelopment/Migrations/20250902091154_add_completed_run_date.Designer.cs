@@ -4,6 +4,7 @@ using FPVDevelopment.Components.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FPVDevelopment.Migrations
 {
     [DbContext(typeof(FPVDbContext))]
-    partial class FPVDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250902091154_add_completed_run_date")]
+    partial class add_completed_run_date
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,17 +27,20 @@ namespace FPVDevelopment.Migrations
 
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.CompletedRun", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("CompletedRunID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompletedRunID"));
+
+                    b.Property<DateTime>("CompletedRunDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan>("CompletedRunTime")
+                        .HasColumnType("time");
 
                     b.Property<int>("CrashCount")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("DroneID")
                         .HasColumnType("int");
@@ -42,13 +48,10 @@ namespace FPVDevelopment.Migrations
                     b.Property<int>("MapID")
                         .HasColumnType("int");
 
-                    b.Property<TimeSpan>("Time")
-                        .HasColumnType("time");
-
                     b.Property<int>("UserID")
                         .HasColumnType("int");
 
-                    b.HasKey("ID");
+                    b.HasKey("CompletedRunID");
 
                     b.HasIndex("DroneID");
 
@@ -61,21 +64,21 @@ namespace FPVDevelopment.Migrations
 
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Drone", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("DroneID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DroneID"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("DroneName")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int>("Size")
+                    b.Property<int>("DroneSize")
                         .HasColumnType("int");
 
-                    b.HasKey("ID");
+                    b.HasKey("DroneID");
 
                     b.ToTable("Drones");
                 });
@@ -88,10 +91,10 @@ namespace FPVDevelopment.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MapID"));
 
-                    b.Property<int>("Difficulty")
+                    b.Property<int>("MapDifficulty")
                         .HasColumnType("int");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("MapName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -103,11 +106,11 @@ namespace FPVDevelopment.Migrations
 
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.User", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("UserID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserID"));
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
@@ -123,7 +126,7 @@ namespace FPVDevelopment.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.HasKey("ID");
+                    b.HasKey("UserID");
 
                     b.ToTable("Users");
                 });

@@ -5,7 +5,7 @@ namespace FPVDevelopment.Components.Data.Models
     public class User
     {
         [Key]
-        public int UserID { get; set; }
+        public int ID { get; set; }
         [StringLength(20)]
         public string Username { get; set; }
         public string PasswordHash { get; set; }

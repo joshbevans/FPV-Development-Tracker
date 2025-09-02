@@ -1,0 +1,39 @@
+﻿@page "/AddMap"
+@using FPVDevelopment.Components.Services
+@using FPVDevelopment.Components.Data.Models
+@using static FPVDevelopment.Components.Globals.Enums
+@inject MapService mapService;
+@rendermode InteractiveServer
+
+<h1>Add a new map to the database.</h1>
+
+<EditForm FormName="AddMapForm" Model="@map" OnSubmit="HandleSubmit">
+    <label for="NameInput">Map Name: </label>
+    <InputText id="NameInput"
+               @bind-Value="@map.Name"/>
+    <br/><br/>
+
+    <label for="DifficultyInput">Map Difficulty: </label>
+    <InputSelect id="DifficultyInput" @bind-Value="@map.Difficulty">
+        @foreach (MapDifficulty difficulty in Enum.GetValues(typeof(MapDifficulty)))
+        {
+            <option value="@difficulty">@difficulty</option>
+        }
+    </InputSelect>
+    <br /><br />
+
+    <button type="submit" class="btn-primary" disabled="@_isSubmitDisabled">Add Map</button>
+</EditForm>
+
+@code {
+    Map map = new Map();
+
+    private bool _isSubmitDisabled =>
+        string.IsNullOrWhiteSpace(map.Name);
+
+    public void HandleSubmit(EditContext editContext)
+    {
+        Map newMap = (Map)editContext.Model;
+        mapService.AddMap(newMap);
+    }
+}

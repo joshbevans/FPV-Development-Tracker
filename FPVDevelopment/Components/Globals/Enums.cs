@@ -6,7 +6,7 @@ namespace FPVDevelopment.Components.Globals
     {
         public enum MapDifficulty
         {
-            UNRATED,
+            Basic,
             Easy,
             Medium,
             Hard
