@@ -6,26 +6,29 @@
 
 <h1>Add a new map to the database.</h1>
 
-<EditForm Model="@map">
-    <label for="MapNameInput">Map Name: </label>
-    <InputText id="MapNameInput" @bind-Value="@map.MapName"></InputText>
+<EditForm FormName="AddMapForm" Model="@map" OnSubmit="HandleSubmit">
+    <label for="NameInput">Map Name: </label>
+    <InputText id="NameInput"
+               @bind-Value="@map.Name"/>
+    <br/><br/>
 
-    <label for="MapDifficultyInput">Map Difficulty: </label>
-    <InputSelect id="MapDifficultyInput" @bind-Value="@map.MapDifficulty">
+    <label for="DifficultyInput">Map Difficulty: </label>
+    <InputSelect id="DifficultyInput" @bind-Value="@map.Difficulty">
         @foreach (MapDifficulty difficulty in Enum.GetValues(typeof(MapDifficulty)))
         {
             <option value="@difficulty">@difficulty</option>
         }
     </InputSelect>
+    <br /><br />
 
-    <button type="submit" class="btn-primary" disabled="@_isSubmitDisabled">Add Map</button>
+    <button type="submit" class="btn-primary">Add Map</button>
 </EditForm>
 
 @code {
     Map map = new Map();
 
-    private bool _isSubmitDisabled =>
-    string.IsNullOrWhiteSpace(map.MapName);
+    // private bool _isSubmitDisabled =>
+    //     string.IsNullOrWhiteSpace(map.MapName);
 
     public void HandleSubmit(EditContext editContext)
     {
