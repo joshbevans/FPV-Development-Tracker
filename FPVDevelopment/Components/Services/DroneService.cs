@@ -27,10 +27,14 @@ namespace FPVDevelopment.Components.Services
 
         public async Task<IList<Drone>> GetDrones(User user)
         {
-            using (FPVDbContext context = _dbContextFactory.CreateDbContext())
+            if (user is null)
+                throw new ArgumentNullException(nameof(user));
+            
+            using (FPVDbContext context = await _dbContextFactory.CreateDbContextAsync())
             {
                 return await context.Drones
-                    .Where(x => x.User == null || x.User == user)
+                    .Include(d => d.User)
+                    .Where(d => d.User == null || d.User.ID == user.ID)
                     .ToListAsync();
             }
         }
