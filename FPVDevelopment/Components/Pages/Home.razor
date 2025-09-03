@@ -5,26 +5,13 @@
 @inject ToastService toastService
 @rendermode InteractiveServer
 
+<MudPaper Edge="Edge.Start" Class="pa-4 mr-16">
+    <MudStack>
+        <label>Login as melon</label>
+        <MudButton FullWidth="false" Style="width: 200px;" Variant="Variant.Filled" Color="Color.Primary" @onclick="HandleLoginUser">Login</MudButton>
+    </MudStack>
+</MudPaper>
 
-<MudGrid Spacing="7">
-    
-    <PageTitle>Account</PageTitle>
-
-    <h1>FPV Development Tracker!</h1>
-
-    <br/>
-    -------------------------------------- IN DEVELOPMENT --------------------------------------
-    <br/>
-    <br/>
-    User login will go here, for now it just logs into a hard-coded user
-    <br/>
-    <br/>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="HandleLoginUser">Login</MudButton>
-    <br/>
-    <label>The current user is: @currentUser?.User?.DisplayName</label>
-    <br/>
-    -------------------------------------- IN DEVELOPMENT --------------------------------------
-</MudGrid>
 @code {
     private async Task HandleLoginUser()
     {
