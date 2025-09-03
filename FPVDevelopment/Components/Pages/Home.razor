@@ -5,23 +5,26 @@
 @inject ToastService toastService
 @rendermode InteractiveServer
 
-<PageTitle>Account</PageTitle>
 
-<h1>FPV Development Tracker!</h1>
+<MudGrid Spacing="7">
+    
+    <PageTitle>Account</PageTitle>
 
-<br />
--------------------------------------- IN DEVELOPMENT --------------------------------------
-<br />
-<br />
-User login will go here, for now it just logs into a hard-coded user
-<br />
-<br />
-<button id="LoginButton" type="button" @onclick="HandleLoginUser" class="btn-outline-primary">Login</button>
-<br />
-<label>The current user is: @currentUser?.User?.DisplayName</label>
-<br />
--------------------------------------- IN DEVELOPMENT --------------------------------------
+    <h1>FPV Development Tracker!</h1>
 
+    <br/>
+    -------------------------------------- IN DEVELOPMENT --------------------------------------
+    <br/>
+    <br/>
+    User login will go here, for now it just logs into a hard-coded user
+    <br/>
+    <br/>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="HandleLoginUser">Login</MudButton>
+    <br/>
+    <label>The current user is: @currentUser?.User?.DisplayName</label>
+    <br/>
+    -------------------------------------- IN DEVELOPMENT --------------------------------------
+</MudGrid>
 @code {
     private async Task HandleLoginUser()
     {
