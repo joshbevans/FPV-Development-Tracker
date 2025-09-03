@@ -3,7 +3,6 @@
 @inject UserService userService
 @inject CurrentUser currentUser
 @inject ToastService toastService
-@inject PreloadService preloadService
 @rendermode InteractiveServer
 
 <PageTitle>Account</PageTitle>
@@ -30,7 +29,6 @@ User login will go here, for now it just logs into a hard-coded user
         if (currentUser is not null)
         {
             toastService.ShowSuccess("Login Successful!", 5);
-            await preloadService.PreloadDataAsync(currentUser.User);
         }
         else
         {

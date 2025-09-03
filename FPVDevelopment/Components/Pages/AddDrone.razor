@@ -51,7 +51,7 @@
         if (isCustom)
             newDrone.UsedID = currentUser.User.ID;
         
-        droneService.AddDrone(newDrone);
-        toastService.ShowSuccess("Drone Added!", 5);
+        await droneService.AddDrone(newDrone);
+        await toastService.ShowSuccess("Drone Added!", 5);
     }
 }

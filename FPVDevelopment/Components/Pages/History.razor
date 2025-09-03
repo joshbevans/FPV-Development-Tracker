@@ -1,14 +1,45 @@
 ﻿@page "/History"
-@using FPVDevelopment.Components.Services
+@using FPVDevelopment.Components.Data.Classes
+@using FPVDevelopment.Components.Data.Models
+@inject CurrentUser currentUser
+@inject CompletedRunService completedRunService
+@inject DroneService droneService
+@inject MapService mapService
 @rendermode InteractiveServer
 
 <PageTitle>History</PageTitle>
+<br />
+<br />
 
--------------------------------------- IN DEVELOPMENT --------------------------------------
-<br />
-<br />
-Completed run history will go here
-<br />
-<br />
--------------------------------------- IN DEVELOPMENT --------------------------------------
+<MudDataGrid Items="@completedRunList">
+    <Columns>
+        <PropertyColumn Property="x => x.Map.Name" Title="Map Name"/>
+        <PropertyColumn Property="x => x.Drone.Name" Title="Drone Name"/>
+        <PropertyColumn Property="x => x.Drone.Size" Title="Dronze Size"/>
+    </Columns>
+</MudDataGrid>
 
+
+@code{
+    IList<Map> mapList = [];
+    IList<Drone> droneList = [];
+    IList<CompletedRun> completedRunList = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        mapList = await  mapService.GetMaps();
+        droneList = await droneService.GetDrones(currentUser.User);
+        completedRunList = await completedRunService.GetCompletedRuns(currentUser.User);
+        currentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
+    }
+
+    private void OnCurrentUserChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        currentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
+    }
+}
