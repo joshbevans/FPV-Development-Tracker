@@ -1,29 +1,27 @@
 ﻿@page "/"
 @using FPVDevelopment.Components.Data.Classes
-@inject UserService userService
-@inject CurrentUser currentUser
+@inject UserService UserService
+@inject CurrentUser CurrentUser
 @inject ISnackbar Snackbar
 @rendermode InteractiveServer
 
-<MudPaper Edge="Edge.Start" Class="pa-4 mr-16">
-    <MudStack>
-        <label>Login as melon</label>
-        <MudButton
-            FullWidth="false"
-            Style="width: 200px;"
-            Variant="Variant.Filled"
-            Color="Color.Primary"
-            @onclick="HandleLoginUser">
-            Login
-        </MudButton>
-    </MudStack>
-</MudPaper>
+<MudStack Edge="Edge.Start" Class="pa-4 mr-16">
+    <label>Login as melon</label>
+    <MudButton
+        FullWidth="false"
+        Style="width: 200px;"
+        Variant="Variant.Filled"
+        Color="Color.Primary"
+        @onclick="HandleLoginUser">
+        Login
+    </MudButton>
+</MudStack>
 
 @code {
     private async Task HandleLoginUser()
     {
-        currentUser.SetCurrentUser(await userService.Login("user", "pass"));
-        if (currentUser is not null)
+        CurrentUser.SetCurrentUser(await UserService.Login("user", "pass"));
+        if (CurrentUser is not null)
         {
             Snackbar.Add("Login Successful!", Severity.Success);
         }
