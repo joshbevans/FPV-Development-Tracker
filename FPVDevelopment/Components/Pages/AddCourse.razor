@@ -16,7 +16,7 @@
                 <MudCardContent Class="p-2 pt-1">
                     <MudStack Spacing="4">
                         <MudSelect  @bind-Value="@_course.MapID" Label="Select a Map">
-                            @foreach (var map in _mapList)
+                            @foreach (var map in _mapList.OrderBy(m => m.Name))
                             {
                                 <MudSelectItem Value="@map.ID">@map.Name</MudSelectItem>
                             }
