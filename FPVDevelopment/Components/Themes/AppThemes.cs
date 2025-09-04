@@ -10,12 +10,19 @@ public static class AppThemes
         PaletteLight = new PaletteLight
         {
             Primary = "#6750A4",
+            PrimaryContrastText = "#FFFFFF", 
             Secondary = "#625B71",
+            SecondaryContrastText = "#FFFFFF",
             Tertiary = "#7D5260",
+            TertiaryContrastText = "#FFFFFF",
             Info = "#0288D1",
+            InfoContrastText = "#FFFFFF",
             Success = "#00C853",
+            SuccessContrastText = "#FFFFFF",
             Warning = "#FFD600",
+            WarningContrastText = "#000000",
             Error = "#D32F2F",
+            ErrorContrastText = "#FFFFFF",
 
             Background = "#FFFBFE",
             Surface = "#FFFBFE",
@@ -28,12 +35,19 @@ public static class AppThemes
         PaletteDark = new PaletteDark
         {
             Primary = "#D0BCFF",
+            PrimaryContrastText = "#000000", 
             Secondary = "#CCC2DC",
+            SecondaryContrastText = "#000000",
             Tertiary = "#EFB8C8",
+            TertiaryContrastText = "#000000",
             Info = "#81D4FA",
+            InfoContrastText = "#000000",
             Success = "#00E676",
+            SuccessContrastText = "#000000",
             Warning = "#FFD54F",
+            WarningContrastText = "#000000",
             Error = "#EF5350",
+            ErrorContrastText = "#000000",
 
             Background = "#121212",
             Surface = "#1E1E1E",
