@@ -6,8 +6,9 @@
 @rendermode InteractiveServer
 
 <MudStack Edge="Edge.Start" Class="pa-4 mr-16">
-    <label>Login as melon</label>
+    <label>Logged in as @CurrentUser.User?.DisplayName</label>
     <MudButton
+        hidden="@IsUserLoggedIn"
         FullWidth="false"
         Style="width: 200px;"
         Variant="Variant.Filled"
@@ -18,6 +19,25 @@
 </MudStack>
 
 @code {
+    
+    protected override void OnInitialized()
+    {
+        CurrentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
+    }
+
+    private void OnCurrentUserChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        CurrentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
+    }
+
+    private bool IsUserLoggedIn =>
+        CurrentUser.User is not null;
+        
     private async Task HandleLoginUser()
     {
         CurrentUser.SetCurrentUser(await UserService.Login("user", "pass"));
