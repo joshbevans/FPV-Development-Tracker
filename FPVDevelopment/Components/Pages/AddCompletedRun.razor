@@ -19,20 +19,20 @@
                 </MudCardHeader>
                 <MudCardContent Class="p-2 pt-1">
                     <MudStack Spacing="4">
-                        <MudSelect  @bind-Value="@_map" Label="Select a Map">
+                        <MudSelect  @bind-Value="@_map.ID" Label="Select a Map">
                             @foreach (var map in _mapList
                                           .OrderBy(m => m.Name))
                             {
-                                <MudSelectItem Value="@map.ID">"@map.Name"</MudSelectItem>
+                                <MudSelectItem Value="@map.ID">@map.Name</MudSelectItem>
                             }
                         </MudSelect>
                         <MudSelect  @bind-Value="@_completedRun.CourseID" Label="Select a Course">
                             @foreach (var course in _courseList
-                                          .Where(c => c.Map == _map)
+                                          .Where(c => c.MapID == _map.ID)
                                           .OrderBy(c => c.Difficulty)
                                           .ThenBy(c => c.Name))
                             {
-                                <MudSelectItem Value="@course.ID">"@course.Name (@course.Difficulty)"</MudSelectItem>
+                                <MudSelectItem Value="@course.ID">@course.Difficulty - @course.Name</MudSelectItem>
                             }
                         </MudSelect>
                         <MudSelect  @bind-Value="@_completedRun.DroneID" Label="Select a Drone">
@@ -110,7 +110,7 @@
         InvokeAsync(StateHasChanged);
     }
 
-    public void Dispose()
+    private void Dispose()
     {
         CurrentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
     }
@@ -123,10 +123,15 @@
         string.IsNullOrWhiteSpace(_milliseconds.ToString());
 
 
-    public async Task HandleSubmit(EditContext editContext)
+    private async Task HandleSubmit(EditContext editContext)
     {
-        CompletedRun newCompletedRun = (CompletedRun)editContext.Model;
-        newCompletedRun.Time = CreateTimeSpan(); 
+        var newCompletedRun = new CompletedRun()
+        {
+            Time = CreateTimeSpan(),
+            CourseID = _completedRun.CourseID,
+            DroneID = _completedRun.DroneID
+        };
+        
         var flag = await CompletedRunService.AddCompletedRun(newCompletedRun, CurrentUser.User);
         if (flag)
             Snackbar.Add("Completed Run Added!", Severity.Success);
