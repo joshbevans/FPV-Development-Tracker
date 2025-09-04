@@ -11,38 +11,69 @@
 @inject ISnackbar Snackbar
 @rendermode InteractiveServer
 
-<h1>Add a completed run to the database.</h1>
-
-<EditForm FormName="AddCompletedRunForm" Model="@_completedRun" OnSubmit="HandleSubmit">
-    <label for="MapInput">Select Map: </label>
-    <InputSelect id="MapInput" @bind-Value="_completedRun.MapID">
-        <option value="">-- Select a Map --</option>
-        @foreach (var map in _mapList)
-        {
-            string displayTag = $"{map.Name} ({map.Difficulty})";
-            <option value="@map.ID">@displayTag</option>
-        }
-    </InputSelect>
-    <br /><br />
-
-    <label for="DroneInput">Select Drone: </label>
-    <InputSelect id="DroneInput" @bind-Value="_completedRun.DroneID">
-        <option value="">-- Select a Drone --</option>
-        @foreach (var drone in _droneList)
-        {
-            string displayTag = $"{drone.Name} ({Enums.GetEnumDescription(drone.Size)})";
-            <option value="@drone.ID">@displayTag</option>
-        }
-    </InputSelect>
-    <br /><br />
-
-    <label>Input Time: </label>
-    <input type="number" @bind="_minutes">
-    <input type="number" @bind="_seconds">
-    <input type="number" @bind="_milliseconds">
-    <br /><br />
-
-    <button type="submit" class="btn-outline-primary" disabled="@IsSubmitDisabled">Add Completed Run</button>
+<EditForm FormName="AddCompletedRunForm" Model="@_completedRun" OnSubmit="@HandleSubmit">
+    <MudGrid Edge="Edge.Start" Class="mr-16">
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Add a new completed run to the database.</MudText>
+                </MudCardHeader>
+                <MudCardContent Class="p-2 pt-1">
+                    <MudStack Spacing="4">
+                        <MudSelect  @bind-Value="@_completedRun.MapID" Label="Select a Map">
+                            @foreach (var map in _mapList)
+                            {
+                                string displayTag = $"{map.Name} ({map.Difficulty})";
+                                <MudSelectItem Value="@map.ID">@displayTag</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudSelect  @bind-Value="@_completedRun.DroneID" Label="Select a Drone">
+                            @foreach (var drone in _droneList)
+                            {
+                                string displayTag = $"{drone.Name} ({Enums.GetEnumDescription(drone.Size)})";
+                                <MudSelectItem Value="@drone.ID">@displayTag</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudGrid Spacing="3">
+                            <MudItem xs="4">
+                            <MudNumericField T="int"
+                                             Label="Minutes"
+                                             Variant="Variant.Outlined"
+                                             Min="0"
+                                             Max="59"
+                                             @bind-Value="_minutes"/>
+                            </MudItem>
+                            <MudItem xs="4">
+                            <MudNumericField T="int"
+                                             Label="Seconds"
+                                             Variant="Variant.Outlined"
+                                             Min="0"
+                                             Max="59"
+                                             @bind-Value="_seconds"/>
+                            </MudItem>
+                            <MudItem xs="4">
+                            <MudNumericField T="int"
+                                             Label="Milliseconds"
+                                             Variant="Variant.Outlined"
+                                             Min="0"
+                                             Max="999"
+                                             @bind-Value="_milliseconds"/>
+                            </MudItem>
+                        </MudGrid>
+                    </MudStack>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton
+                        ButtonType="ButtonType.Submit"
+                        Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        disabled="@IsSubmitDisabled">
+                        Add Completed Run
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
 </EditForm>
 
 @code {
@@ -83,7 +114,10 @@
     {
         CompletedRun newCompletedRun = (CompletedRun)editContext.Model;
         newCompletedRun.Time = CreateTimeSpan(); 
-        await CompletedRunService.AddCompletedRun(newCompletedRun, CurrentUser.User);
-        Snackbar.Add("Completed Run Added!", Severity.Success);
+        var flag = await CompletedRunService.AddCompletedRun(newCompletedRun, CurrentUser.User);
+        if (flag)
+            Snackbar.Add("Completed Run Added!", Severity.Success);
+        else
+            Snackbar.Add("Failed To Add Completed Run", Severity.Error);
     }
 }

@@ -13,7 +13,7 @@ namespace FPVDevelopment.Components.Services
             _dbContextFactory = dbContextFactory;
         }
 
-        public async Task AddCompletedRun(CompletedRun completedRun, User user)
+        public async Task<bool> AddCompletedRun(CompletedRun completedRun, User user)
         {
             if (completedRun is null)
                 throw new ArgumentNullException(nameof(completedRun));
@@ -27,7 +27,17 @@ namespace FPVDevelopment.Components.Services
                 completedRun.UserID = user.ID;
                 completedRun.Date = DateTime.Now;
                 context.CompletedRuns.Add(completedRun);
-                await context.SaveChangesAsync();
+                
+                try
+                {
+                    await context.SaveChangesAsync();
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    return false;
+                }
             }
         }
 
