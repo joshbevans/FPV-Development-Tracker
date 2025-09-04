@@ -39,6 +39,7 @@ namespace FPVDevelopment.Components.Services
             using (FPVDbContext context = await _dbContextFactory.CreateDbContextAsync())
             {
                 return await context.Maps
+                    .Include(m => m.Courses)
                     .ToListAsync();
             }
         }
