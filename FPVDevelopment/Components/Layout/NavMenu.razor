@@ -1,22 +1,22 @@
 ﻿@using FPVDevelopment.Components.Data.Classes
 @using FPVDevelopment.Components.Data.Models
-@inject CurrentUser currentUser
+@inject CurrentUser CurrentUser
 @rendermode InteractiveServer
 
 
 <MudNavMenu>
     <MudNavLink Href="/" Icon="@Icons.Material.Filled.Person" Match="NavLinkMatch.All">Account</MudNavLink>
-    <MudNavLink Href="/History" Icon="@Icons.Material.Filled.History" Match="NavLinkMatch.Prefix" hidden="@_isNavHidden">History</MudNavLink>
-    <MudNavLink Href="/AddCompletedRun" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@_isNavHidden">Add Completed Run</MudNavLink>
-    <MudNavLink Href="/AddMap" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@_isNavHidden">Add Map</MudNavLink>
-    <MudNavLink Href="/AddDrone" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@_isNavHidden">Add Drone</MudNavLink>
+    <MudNavLink Href="/History" Icon="@Icons.Material.Filled.History" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">History</MudNavLink>
+    <MudNavLink Href="/AddCompletedRun" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">Add Completed Run</MudNavLink>
+    <MudNavLink Href="/AddMap" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">Add Map</MudNavLink>
+    <MudNavLink Href="/AddDrone" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">Add Drone</MudNavLink>
 </MudNavMenu>
 
 
 @code {
     protected override void OnInitialized()
     {
-        currentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
+        CurrentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
     }
 
     private void OnCurrentUserChanged(object? sender, EventArgs e)
@@ -26,9 +26,9 @@
 
     public void Dispose()
     {
-        currentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
+        CurrentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
     }
 
-    private bool _isNavHidden =>
-        currentUser.User is null;
+    private bool IsNavHidden =>
+        CurrentUser.User is null;
 }
