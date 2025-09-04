@@ -2,10 +2,9 @@
 @using FPVDevelopment.Components.Data.Classes
 @using FPVDevelopment.Components.Data.Models
 @using FPVDevelopment.Components.Globals
-@using Microsoft.EntityFrameworkCore
-@using static FPVDevelopment.Components.Globals.Enums
 @inject CompletedRunService CompletedRunService;
-@inject MapService MapService;
+@inject CourseService CourseService;
+@inject MapService MapService
 @inject DroneService DroneService;
 @inject CurrentUser CurrentUser;
 @inject ISnackbar Snackbar
@@ -20,15 +19,26 @@
                 </MudCardHeader>
                 <MudCardContent Class="p-2 pt-1">
                     <MudStack Spacing="4">
-                        <MudSelect  @bind-Value="@_completedRun.MapID" Label="Select a Map">
-                            @foreach (var map in _mapList)
+                        <MudSelect  @bind-Value="@_map.ID" Label="Select a Map">
+                            @foreach (var map in _mapList
+                                          .OrderBy(m => m.Name))
                             {
-                                string displayTag = $"{map.Name} ({map.Difficulty})";
-                                <MudSelectItem Value="@map.ID">@displayTag</MudSelectItem>
+                                <MudSelectItem Value="@map.ID">@map.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudSelect  @bind-Value="@_completedRun.CourseID" Label="Select a Course">
+                            @foreach (var course in _courseList
+                                          .Where(c => c.MapID == _map.ID)
+                                          .OrderBy(c => c.Difficulty)
+                                          .ThenBy(c => c.Name))
+                            {
+                                <MudSelectItem Value="@course.ID">@course.Difficulty - @course.Name</MudSelectItem>
                             }
                         </MudSelect>
                         <MudSelect  @bind-Value="@_completedRun.DroneID" Label="Select a Drone">
-                            @foreach (var drone in _droneList)
+                            @foreach (var drone in _droneList
+                                          .OrderBy(d => d.Size)
+                                          .ThenBy(d => d.Name))
                             {
                                 string displayTag = $"{drone.Name} ({Enums.GetEnumDescription(drone.Size)})";
                                 <MudSelectItem Value="@drone.ID">@displayTag</MudSelectItem>
@@ -78,8 +88,10 @@
 
 @code {
     private readonly CompletedRun _completedRun = new CompletedRun();
+    private IList<Course> _courseList = [];
     private IList<Map> _mapList = [];
     private IList<Drone> _droneList = [];
+    private Map _map = new Map();
     private int _minutes;
     private int _seconds;
     private int _milliseconds;
@@ -87,7 +99,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _mapList = await  MapService.GetMaps();
+        _mapList = await MapService.GetMaps();
+        _courseList = await CourseService.GetCourses();
         _droneList = await DroneService.GetDrones(CurrentUser.User);
         CurrentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
     }
@@ -97,23 +110,28 @@
         InvokeAsync(StateHasChanged);
     }
 
-    public void Dispose()
+    private void Dispose()
     {
         CurrentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
     }
 
     private bool IsSubmitDisabled =>
-        _completedRun.MapID is 0 ||
+        _completedRun.CourseID is 0 ||
         _completedRun.DroneID is 0 ||
         string.IsNullOrWhiteSpace(_minutes.ToString()) ||
         string.IsNullOrWhiteSpace(_seconds.ToString()) ||
         string.IsNullOrWhiteSpace(_milliseconds.ToString());
 
 
-    public async Task HandleSubmit(EditContext editContext)
+    private async Task HandleSubmit(EditContext editContext)
     {
-        CompletedRun newCompletedRun = (CompletedRun)editContext.Model;
-        newCompletedRun.Time = CreateTimeSpan(); 
+        var newCompletedRun = new CompletedRun()
+        {
+            Time = CreateTimeSpan(),
+            CourseID = _completedRun.CourseID,
+            DroneID = _completedRun.DroneID
+        };
+        
         var flag = await CompletedRunService.AddCompletedRun(newCompletedRun, CurrentUser.User);
         if (flag)
             Snackbar.Add("Completed Run Added!", Severity.Success);

@@ -16,7 +16,7 @@ namespace FPVDevelopment.Components.Globals
 
             return value.ToString();
         }
-        public enum MapDifficulty
+        public enum Difficulty
         {
             Basic,
             Easy,
