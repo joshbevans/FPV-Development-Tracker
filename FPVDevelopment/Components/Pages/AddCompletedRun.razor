@@ -4,61 +4,92 @@
 @using FPVDevelopment.Components.Globals
 @using Microsoft.EntityFrameworkCore
 @using static FPVDevelopment.Components.Globals.Enums
-@inject CompletedRunService completedRunService;
-@inject MapService mapService;
-@inject DroneService droneService;
-@inject CurrentUser currentUser;
-@inject ToastService toastService
+@inject CompletedRunService CompletedRunService;
+@inject MapService MapService;
+@inject DroneService DroneService;
+@inject CurrentUser CurrentUser;
+@inject ISnackbar Snackbar
 @rendermode InteractiveServer
 
-<h1>Add a completed run to the database.</h1>
-
-<EditForm FormName="AddCompletedRunForm" Model="@completedRun" OnSubmit="HandleSubmit">
-    <label for="MapInput">Select Map: </label>
-    <InputSelect id="MapInput" @bind-Value="completedRun.MapID">
-        <option value="">-- Select a Map --</option>
-        @foreach (var map in mapList)
-        {
-            string displayTag = $"{map.Name} ({map.Difficulty})";
-            <option value="@map.ID">@displayTag</option>
-        }
-    </InputSelect>
-    <br /><br />
-
-    <label for="DroneInput">Select Drone: </label>
-    <InputSelect id="DroneInput" @bind-Value="completedRun.DroneID">
-        <option value="">-- Select a Drone --</option>
-        @foreach (var drone in droneList)
-        {
-            string displayTag = $"{drone.Name} ({Enums.GetEnumDescription(drone.Size)})";
-            <option value="@drone.ID">@displayTag</option>
-        }
-    </InputSelect>
-    <br /><br />
-
-    <label>Input Time: </label>
-    <input type="number" @bind="minutes">
-    <input type="number" @bind="seconds">
-    <input type="number" @bind="milliseconds">
-    <br /><br />
-
-    <button type="submit" class="btn-outline-primary" disabled="@_isSubmitDisabled">Add Completed Run</button>
+<EditForm FormName="AddCompletedRunForm" Model="@_completedRun" OnSubmit="@HandleSubmit">
+    <MudGrid Edge="Edge.Start" Class="mr-16">
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Add a new completed run to the database.</MudText>
+                </MudCardHeader>
+                <MudCardContent Class="p-2 pt-1">
+                    <MudStack Spacing="4">
+                        <MudSelect  @bind-Value="@_completedRun.MapID" Label="Select a Map">
+                            @foreach (var map in _mapList)
+                            {
+                                string displayTag = $"{map.Name} ({map.Difficulty})";
+                                <MudSelectItem Value="@map.ID">@displayTag</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudSelect  @bind-Value="@_completedRun.DroneID" Label="Select a Drone">
+                            @foreach (var drone in _droneList)
+                            {
+                                string displayTag = $"{drone.Name} ({Enums.GetEnumDescription(drone.Size)})";
+                                <MudSelectItem Value="@drone.ID">@displayTag</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudGrid Spacing="3">
+                            <MudItem xs="4">
+                            <MudNumericField T="int"
+                                             Label="Minutes"
+                                             Variant="Variant.Outlined"
+                                             Min="0"
+                                             Max="59"
+                                             @bind-Value="_minutes"/>
+                            </MudItem>
+                            <MudItem xs="4">
+                            <MudNumericField T="int"
+                                             Label="Seconds"
+                                             Variant="Variant.Outlined"
+                                             Min="0"
+                                             Max="59"
+                                             @bind-Value="_seconds"/>
+                            </MudItem>
+                            <MudItem xs="4">
+                            <MudNumericField T="int"
+                                             Label="Milliseconds"
+                                             Variant="Variant.Outlined"
+                                             Min="0"
+                                             Max="999"
+                                             @bind-Value="_milliseconds"/>
+                            </MudItem>
+                        </MudGrid>
+                    </MudStack>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton
+                        ButtonType="ButtonType.Submit"
+                        Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        disabled="@IsSubmitDisabled">
+                        Add Completed Run
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
 </EditForm>
 
 @code {
-    CompletedRun completedRun = new CompletedRun();
-    IList<Map> mapList = [];
-    IList<Drone> droneList = [];
-    private int minutes;
-    private int seconds;
-    private int milliseconds;
-    private TimeSpan CreateTimeSpan() => new TimeSpan(0, 0, minutes, seconds, milliseconds);
+    private readonly CompletedRun _completedRun = new CompletedRun();
+    private IList<Map> _mapList = [];
+    private IList<Drone> _droneList = [];
+    private int _minutes;
+    private int _seconds;
+    private int _milliseconds;
+    private TimeSpan CreateTimeSpan() => new TimeSpan(0, 0, _minutes, _seconds, _milliseconds);
 
     protected override async Task OnInitializedAsync()
     {
-        mapList = await  mapService.GetMaps();
-        droneList = await droneService.GetDrones(currentUser.User);
-        currentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
+        _mapList = await  MapService.GetMaps();
+        _droneList = await DroneService.GetDrones(CurrentUser.User);
+        CurrentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
     }
 
     private void OnCurrentUserChanged(object? sender, EventArgs e)
@@ -68,22 +99,25 @@
 
     public void Dispose()
     {
-        currentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
+        CurrentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
     }
 
-    private bool _isSubmitDisabled =>
-        completedRun.MapID is 0 ||
-        completedRun.DroneID is 0 ||
-        string.IsNullOrWhiteSpace(minutes.ToString()) ||
-        string.IsNullOrWhiteSpace(seconds.ToString()) ||
-        string.IsNullOrWhiteSpace(milliseconds.ToString());
+    private bool IsSubmitDisabled =>
+        _completedRun.MapID is 0 ||
+        _completedRun.DroneID is 0 ||
+        string.IsNullOrWhiteSpace(_minutes.ToString()) ||
+        string.IsNullOrWhiteSpace(_seconds.ToString()) ||
+        string.IsNullOrWhiteSpace(_milliseconds.ToString());
 
 
-    public void HandleSubmit(EditContext editContext)
+    public async Task HandleSubmit(EditContext editContext)
     {
         CompletedRun newCompletedRun = (CompletedRun)editContext.Model;
         newCompletedRun.Time = CreateTimeSpan(); 
-        completedRunService.AddCompletedRun(newCompletedRun, currentUser.User);
-        toastService.ShowSuccess("Completed Run Added!", 5);
+        var flag = await CompletedRunService.AddCompletedRun(newCompletedRun, CurrentUser.User);
+        if (flag)
+            Snackbar.Add("Completed Run Added!", Severity.Success);
+        else
+            Snackbar.Add("Failed To Add Completed Run", Severity.Error);
     }
 }

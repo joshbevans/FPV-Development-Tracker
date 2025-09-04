@@ -11,11 +11,25 @@
 <br />
 <br />
 
+<MudChat ChatPosition="ChatBubblePosition.Start">
+    <MudChatBubble>
+        test1
+    </MudChatBubble>
+    <MudChatBubble>
+        test2
+    </MudChatBubble>
+</MudChat>
+<MudChat ChatPosition="ChatBubblePosition.End">
+    <MudChatBubble>
+        test3
+    </MudChatBubble>
+</MudChat>
+
 <MudDataGrid Items="@completedRunList">
     <Columns>
         <PropertyColumn Property="x => x.Map.Name" Title="Map Name"/>
         <PropertyColumn Property="x => x.Drone.Name" Title="Drone Name"/>
-        <PropertyColumn Property="x => x.Drone.Size" Title="Dronze Size"/>
+        <PropertyColumn Property="x => x.Drone.Size" Title="Drone Size"/>
     </Columns>
 </MudDataGrid>
 

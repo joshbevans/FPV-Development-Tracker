@@ -1,38 +1,53 @@
 ﻿@page "/"
 @using FPVDevelopment.Components.Data.Classes
-@inject UserService userService
-@inject CurrentUser currentUser
-@inject ToastService toastService
+@inject UserService UserService
+@inject CurrentUser CurrentUser
+@inject ISnackbar Snackbar
 @rendermode InteractiveServer
 
-<PageTitle>Account</PageTitle>
-
-<h1>FPV Development Tracker!</h1>
-
-<br />
--------------------------------------- IN DEVELOPMENT --------------------------------------
-<br />
-<br />
-User login will go here, for now it just logs into a hard-coded user
-<br />
-<br />
-<button id="LoginButton" type="button" @onclick="HandleLoginUser" class="btn-outline-primary">Login</button>
-<br />
-<label>The current user is: @currentUser?.User?.DisplayName</label>
-<br />
--------------------------------------- IN DEVELOPMENT --------------------------------------
+<MudStack Edge="Edge.Start" Class="pa-4 mr-16">
+    <label>Logged in as @CurrentUser.User?.DisplayName</label>
+    <MudButton
+        hidden="@IsUserLoggedIn"
+        FullWidth="false"
+        Style="width: 200px;"
+        Variant="Variant.Filled"
+        Color="Color.Primary"
+        @onclick="HandleLoginUser">
+        Login
+    </MudButton>
+</MudStack>
 
 @code {
+    
+    protected override void OnInitialized()
+    {
+        CurrentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
+    }
+
+    private void OnCurrentUserChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        CurrentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
+    }
+
+    private bool IsUserLoggedIn =>
+        CurrentUser.User is not null;
+        
     private async Task HandleLoginUser()
     {
-        currentUser.SetCurrentUser(await userService.Login("user", "pass"));
-        if (currentUser is not null)
+        CurrentUser.SetCurrentUser(await UserService.Login("user", "pass"));
+        if (CurrentUser is not null)
         {
-            toastService.ShowSuccess("Login Successful!", 5);
+            Snackbar.Add("Login Successful!", Severity.Success);
         }
         else
         {
-            toastService.ShowError("Login Failed!", 5);
+            Snackbar.Add("Login Failed!", Severity.Error);
         }
     }
 }
