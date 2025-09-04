@@ -49,6 +49,7 @@ namespace FPVDevelopment.Components.Services
                 return await context.CompletedRuns
                     .Where(r => r.UserID == user.ID)
                     .Include(r => r.Course)
+                        .ThenInclude(c => c.Map)
                     .Include(r => r.Drone)
                     .ToListAsync();
             }

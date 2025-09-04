@@ -13,30 +13,91 @@
 <div style="max-height: calc(100vh - 150px); overflow-y: auto; padding: 0 16px;">
     <MudGrid Spacing="2" Direction="Column">
         @foreach (var run in _completedRunList.OrderByDescending(r => r.Date))
-        {
-            <MudItem xs="12">
-                <MudCard Style="width: 100%;">
-                    <MudCardContent>
-                        <MudText Typo="Typo.h6" GutterBottom="true">@run.Course.Name (@run.Course.Difficulty)</MudText>
-                        <MudText>Drone: @run.Drone.Name (@Enums.GetEnumDescription(@run.Drone.Size))</MudText>
-                        <MudText>Date: @run.Date.ToShortDateString()</MudText>
-                        <MudText>
-                            Time: @(run.Time.HasValue
-                                      ? run.Time.Value.ToString(@"mm\:ss\.fff")
-                                      : "N/A")
+{
+    var courseRunsWithTime = _completedRunList
+        .Where(r2 => r2.CourseID == run.CourseID && r2.Time.HasValue)
+        .OrderBy(r2 => r2.Time.Value)
+        .ToList();
+
+    var isBestRun = run.Time.HasValue && courseRunsWithTime.FirstOrDefault() == run;
+
+    TimeSpan? improvement = null;
+    if (isBestRun && courseRunsWithTime.Count > 1)
+    {
+        improvement = courseRunsWithTime[1].Time - run.Time; // difference from previous best
+    }
+
+    var diffTextColor = isBestRun ? "green" : "red";
+    var diffTextStyle = $"color:{diffTextColor};";
+    var cardStyle = isBestRun ? "width:100%; border:2px solid gold;" : "width:100%;";
+
+    <MudItem xs="12">
+        <MudCard Style="@cardStyle">
+            <MudCardContent>
+                <!-- Top row: Map - Course and Date -->
+                <MudGrid Style="margin-bottom:4px;">
+                    <MudItem xs="8">
+                        <MudText Typo="Typo.h6">
+                            @run.Course.Map.Name - @run.Course.Name (@run.Course.Difficulty)
                         </MudText>
-                    </MudCardContent>
-                </MudCard>
-            </MudItem>
-        }
+                    </MudItem>
+                    <MudItem xs="4" Class="d-flex justify-end">
+                        <MudText Typo="Typo.body2">@run.Date.ToShortDateString()</MudText>
+                    </MudItem>
+                </MudGrid>
+
+                <!-- Middle row: Drone info -->
+                <MudText Style="margin-bottom:4px;">
+                    Drone: @run.Drone.Name (@Enums.GetEnumDescription(run.Drone.Size))
+                </MudText>
+
+                <!-- Bottom row: Difference / Improvement and Time -->
+                <MudGrid>
+                    <MudItem xs="8">
+                        <MudText Style="@diffTextStyle">
+                            @if (isBestRun)
+                            {
+                                if (improvement.HasValue)
+                                {
+                                    @($"New personal best! Improved by: -{improvement.Value.TotalSeconds:F3}s")
+                                }
+                                else
+                                {
+                                    @("New personal best!")
+                                }
+                            }
+                            else
+                            {
+                                @(run.Time.HasValue ? $"+{(run.Time.Value - _bestTimesPerCourse[run.CourseID]).TotalSeconds:F3}s" : "N/A")
+                            }
+                        </MudText>
+                    </MudItem>
+                    <MudItem xs="4" Class="d-flex justify-end">
+                        <MudText>
+                            Time: @(run.Time.HasValue ? run.Time.Value.ToString(@"mm\:ss\.fff") : "N/A")
+                        </MudText>
+                    </MudItem>
+                </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+}
+
     </MudGrid>
 </div>
+
+
+
+
+
+
 
 
 @code{
     private IList<Map> _mapList = [];
     private IList<Drone> _droneList = [];
     private IList<CompletedRun> _completedRunList = [];
+    private Dictionary<int, TimeSpan> _bestTimesPerCourse = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -44,6 +105,14 @@
         _droneList = await DroneService.GetDrones(CurrentUser.User);
         _completedRunList = await CompletedRunService.GetCompletedRuns(CurrentUser.User);
         CurrentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
+        
+        _bestTimesPerCourse = _completedRunList
+            .Where(r => r.Time.HasValue)
+            .GroupBy(r => r.CourseID)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Min(r => r.Time.Value)
+            );
     }
 
     private void OnCurrentUserChanged(object? sender, EventArgs e)
