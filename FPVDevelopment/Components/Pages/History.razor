@@ -1,31 +1,17 @@
 ﻿@page "/History"
 @using FPVDevelopment.Components.Data.Classes
 @using FPVDevelopment.Components.Data.Models
-@inject CurrentUser currentUser
-@inject CompletedRunService completedRunService
-@inject DroneService droneService
-@inject MapService mapService
+@inject CurrentUser CurrentUser
+@inject CompletedRunService CompletedRunService
+@inject DroneService DroneService
+@inject MapService MapService
 @rendermode InteractiveServer
 
 <PageTitle>History</PageTitle>
 <br />
 <br />
 
-<MudChat ChatPosition="ChatBubblePosition.Start">
-    <MudChatBubble>
-        test1
-    </MudChatBubble>
-    <MudChatBubble>
-        test2
-    </MudChatBubble>
-</MudChat>
-<MudChat ChatPosition="ChatBubblePosition.End">
-    <MudChatBubble>
-        test3
-    </MudChatBubble>
-</MudChat>
-
-<MudDataGrid Items="@completedRunList">
+<MudDataGrid Items="@_completedRunList">
     <Columns>
         <PropertyColumn Property="x => x.Map.Name" Title="Map Name"/>
         <PropertyColumn Property="x => x.Drone.Name" Title="Drone Name"/>
@@ -35,16 +21,16 @@
 
 
 @code{
-    IList<Map> mapList = [];
-    IList<Drone> droneList = [];
-    IList<CompletedRun> completedRunList = [];
+    private IList<Map> _mapList = [];
+    private IList<Drone> _droneList = [];
+    private IList<CompletedRun> _completedRunList = [];
 
     protected override async Task OnInitializedAsync()
     {
-        mapList = await  mapService.GetMaps();
-        droneList = await droneService.GetDrones(currentUser.User);
-        completedRunList = await completedRunService.GetCompletedRuns(currentUser.User);
-        currentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
+        _mapList = await  MapService.GetMaps();
+        _droneList = await DroneService.GetDrones(CurrentUser.User);
+        _completedRunList = await CompletedRunService.GetCompletedRuns(CurrentUser.User);
+        CurrentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
     }
 
     private void OnCurrentUserChanged(object? sender, EventArgs e)
@@ -54,6 +40,6 @@
 
     public void Dispose()
     {
-        currentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
+        CurrentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
     }
 }
