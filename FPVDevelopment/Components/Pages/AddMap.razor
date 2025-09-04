@@ -17,12 +17,6 @@
                     <MudStack Spacing="4">
                         <MudTextField Label="Map Name" HelperText="Max. 50 characters"
                                       @bind-Value="@_map.Name"></MudTextField>
-                        <MudSelect T="MapDifficulty" @bind-Value="@_map.Difficulty" Label="Select a Difficulty">
-                            @foreach (MapDifficulty difficulty in Enum.GetValues(typeof(MapDifficulty)))
-                            {
-                                <MudSelectItem Value="@difficulty">@difficulty</MudSelectItem>
-                            }
-                        </MudSelect>
                     </MudStack>
                 </MudCardContent>
                 <MudCardActions>
@@ -50,7 +44,6 @@
         var newMap = new Map
         {
             Name = _map.Name,
-            Difficulty = _map.Difficulty
         };
         
         var flag = await MapService.AddMap(newMap);

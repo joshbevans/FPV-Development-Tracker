@@ -1,0 +1,75 @@
+@page "/AddCourse"
+@using FPVDevelopment.Components.Data.Models
+@using static FPVDevelopment.Components.Globals.Enums
+@inject CourseService CourseService;
+@inject MapService MapService;
+@inject ISnackbar Snackbar
+@rendermode InteractiveServer
+
+<EditForm FormName="AddCourseForm" Model="@_course" OnSubmit="@HandleSubmit">
+    <MudGrid Edge="Edge.Start" Class="mr-16">
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Add a new course to the database.</MudText>
+                </MudCardHeader>
+                <MudCardContent Class="p-2 pt-1">
+                    <MudStack Spacing="4">
+                        <MudSelect  @bind-Value="@_course.MapID" Label="Select a Map">
+                            @foreach (var map in _mapList)
+                            {
+                                <MudSelectItem Value="@map.ID">@map.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudTextField Label="Course Name" HelperText="Max. 50 characters"
+                                      @bind-Value="@_course.Name"></MudTextField>
+                        <MudSelect T="Difficulty" @bind-Value="@_course.Difficulty" Label="Select a Difficulty">
+                            @foreach (Difficulty difficulty in Enum.GetValues(typeof(Difficulty)))
+                            {
+                                <MudSelectItem Value="@difficulty">@difficulty</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudStack>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton
+                        ButtonType="ButtonType.Submit"
+                        Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        disabled="@IsSubmitDisabled">
+                        Add Course
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    private readonly Course _course = new Course();
+    private IList<Map> _mapList = [];
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _mapList = await  MapService.GetMaps();
+    }
+
+    private bool IsSubmitDisabled =>
+        string.IsNullOrWhiteSpace(_course.Name);
+
+    private async Task HandleSubmit(EditContext editContext)
+    {
+        var newCourse = new Course()
+        {
+            Name = _course.Name,
+            Difficulty = _course.Difficulty,
+            MapID = _course.MapID
+        };
+        
+        var flag = await CourseService.AddCourse(newCourse);
+        if (flag)
+            Snackbar.Add("Course Added!", Severity.Success);
+        else
+            Snackbar.Add("Course Failed To Add", Severity.Error);
+    }
+}

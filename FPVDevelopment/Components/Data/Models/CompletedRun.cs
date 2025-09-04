@@ -10,11 +10,11 @@ namespace FPVDevelopment.Components.Data.Models
         public TimeSpan? Time { get; set; }
         public DateTime Date { get; set; }
         public int UserID { get; set; }
-        public int MapID { get; set; }
+        public int CourseID { get; set; }
         public int DroneID { get; set; }
 
         public User User { get; set; }
-        public Map Map { get; set; }
+        public Course Course { get; set; }
         public Drone Drone { get; set; }
     }
 }

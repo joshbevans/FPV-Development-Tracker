@@ -22,8 +22,6 @@ namespace FPVDevelopment.Components.Services
 
             using (FPVDbContext context = await _dbContextFactory.CreateDbContextAsync())
             {
-                completedRun.Map = context.Maps
-                    .First(map => map.ID == completedRun.MapID);
                 completedRun.UserID = user.ID;
                 completedRun.Date = DateTime.Now;
                 context.CompletedRuns.Add(completedRun);
@@ -50,7 +48,7 @@ namespace FPVDevelopment.Components.Services
             {
                 return await context.CompletedRuns
                     .Where(r => r.UserID == user.ID)
-                    .Include(r => r.Map)
+                    .Include(r => r.Course)
                     .Include(r => r.Drone)
                     .ToListAsync();
             }
