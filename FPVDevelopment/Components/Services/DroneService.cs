@@ -25,7 +25,7 @@ namespace FPVDevelopment.Components.Services
             }
         }
 
-        public async Task<IList<Drone>> GetDrones(User user)
+        public async Task<IList<Drone>> GetDrones(User? user)
         {
             if (user is null)
                 throw new ArgumentNullException(nameof(user));

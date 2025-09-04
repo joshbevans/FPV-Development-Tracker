@@ -1,7 +1,7 @@
-﻿@inherits LayoutComponentBase
+﻿@using FPVDevelopment.Components.Themes
+@inherits LayoutComponentBase
 
-<Toast/>
-<MudThemeProvider/>
+<MudThemeProvider Theme="@AppThemes.AppTheme" @bind-IsDarkMode="_isDarkMode"/>
 <MudPopoverProvider/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
@@ -10,8 +10,12 @@
     <MudAppBar>
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle"/>
         FPV Development Tracker
+        <MudSpacer />
+        <MudIconButton OnClick="@ToggleTheme"
+                       Icon="@(_isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
+                       Color="Color.Inherit" />
     </MudAppBar>
-    <MudDrawer @bind-Open="@_drawerOpen">
+    <MudDrawer ClipMode="DrawerClipMode.Docked" @bind-Open="@_drawerOpen">
         <NavMenu/>
     </MudDrawer>
     <MudMainContent>
@@ -22,9 +26,8 @@
 @code
 {
     private bool _drawerOpen = true;
+    private bool _isDarkMode = true;
 
-    public async Task DrawerToggle()
-    {
-        _drawerOpen = !_drawerOpen;
-    }
+    private void DrawerToggle() => _drawerOpen = !_drawerOpen;
+    private void ToggleTheme() => _isDarkMode = !_isDarkMode;
 }

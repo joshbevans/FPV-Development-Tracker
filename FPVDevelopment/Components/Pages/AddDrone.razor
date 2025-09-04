@@ -2,9 +2,9 @@
 @using FPVDevelopment.Components.Data.Classes
 @using FPVDevelopment.Components.Data.Models
 @using static FPVDevelopment.Components.Globals.Enums
-@inject DroneService droneService;
-@inject ToastService toastService
-@inject CurrentUser currentUser;
+@inject DroneService DroneService;
+@inject CurrentUser CurrentUser;
+@inject ISnackbar Snackbar
 @rendermode InteractiveServer
 
 <h1>Add a new drone to the database.</h1>
@@ -49,9 +49,9 @@
         };
         
         if (isCustom)
-            newDrone.UsedID = currentUser.User.ID;
+            newDrone.UsedID = CurrentUser.User.ID;
         
-        await droneService.AddDrone(newDrone);
-        await toastService.ShowSuccess("Drone Added!", 5);
+        await DroneService.AddDrone(newDrone);
+        Snackbar.Add("Drone Added!", Severity.Success);
     }
 }

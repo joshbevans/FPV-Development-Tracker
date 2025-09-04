@@ -31,7 +31,7 @@ namespace FPVDevelopment.Components.Services
             }
         }
 
-        public async Task<IList<CompletedRun>> GetCompletedRuns(User user)
+        public async Task<IList<CompletedRun>> GetCompletedRuns(User? user)
         {
             if (user is null)
                 throw new ArgumentNullException(nameof(user));

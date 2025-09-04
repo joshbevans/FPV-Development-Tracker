@@ -2,7 +2,7 @@
 @using FPVDevelopment.Components.Data.Classes
 @inject UserService userService
 @inject CurrentUser currentUser
-@inject ToastService toastService
+@inject ISnackbar Snackbar
 @rendermode InteractiveServer
 
 <MudPaper Edge="Edge.Start" Class="pa-4 mr-16">
@@ -25,11 +25,11 @@
         currentUser.SetCurrentUser(await userService.Login("user", "pass"));
         if (currentUser is not null)
         {
-            toastService.ShowSuccess("Login Successful!", 5);
+            Snackbar.Add("Login Successful!", Severity.Success);
         }
         else
         {
-            toastService.ShowError("Login Failed!", 5);
+            Snackbar.Add("Login Failed!", Severity.Error);
         }
     }
 }

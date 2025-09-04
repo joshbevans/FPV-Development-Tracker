@@ -19,7 +19,6 @@ builder.Services.AddSingleton<CompletedRunService>();
 builder.Services.AddSingleton<DroneService>();
 builder.Services.AddSingleton<MapService>();
 builder.Services.AddSingleton<UserService>();
-builder.Services.AddSingleton<ToastService>();
 
 builder.Services.AddSingleton<CurrentUser>();
 builder.Services.AddMudServices();

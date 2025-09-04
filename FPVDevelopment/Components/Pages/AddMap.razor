@@ -2,8 +2,8 @@
 @using FPVDevelopment.Components.Services
 @using FPVDevelopment.Components.Data.Models
 @using static FPVDevelopment.Components.Globals.Enums
-@inject MapService mapService;
-@inject ToastService toastService
+@inject MapService MapService;
+@inject ISnackbar Snackbar
 @rendermode InteractiveServer
 
 <h1>Add a new map to the database.</h1>
@@ -40,7 +40,7 @@
             Difficulty = map.Difficulty
         };
         
-        await mapService.AddMap(newMap);
-        toastService.ShowSuccess("Map Added!", 5);
+        await MapService.AddMap(newMap);
+        Snackbar.Add("Map Added!", Severity.Success);
     }
 }

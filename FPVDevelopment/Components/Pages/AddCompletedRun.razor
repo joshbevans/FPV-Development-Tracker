@@ -4,20 +4,20 @@
 @using FPVDevelopment.Components.Globals
 @using Microsoft.EntityFrameworkCore
 @using static FPVDevelopment.Components.Globals.Enums
-@inject CompletedRunService completedRunService;
-@inject MapService mapService;
-@inject DroneService droneService;
-@inject CurrentUser currentUser;
-@inject ToastService toastService
+@inject CompletedRunService CompletedRunService;
+@inject MapService MapService;
+@inject DroneService DroneService;
+@inject CurrentUser CurrentUser;
+@inject ISnackbar Snackbar
 @rendermode InteractiveServer
 
 <h1>Add a completed run to the database.</h1>
 
-<EditForm FormName="AddCompletedRunForm" Model="@completedRun" OnSubmit="HandleSubmit">
+<EditForm FormName="AddCompletedRunForm" Model="@_completedRun" OnSubmit="HandleSubmit">
     <label for="MapInput">Select Map: </label>
-    <InputSelect id="MapInput" @bind-Value="completedRun.MapID">
+    <InputSelect id="MapInput" @bind-Value="_completedRun.MapID">
         <option value="">-- Select a Map --</option>
-        @foreach (var map in mapList)
+        @foreach (var map in _mapList)
         {
             string displayTag = $"{map.Name} ({map.Difficulty})";
             <option value="@map.ID">@displayTag</option>
@@ -26,9 +26,9 @@
     <br /><br />
 
     <label for="DroneInput">Select Drone: </label>
-    <InputSelect id="DroneInput" @bind-Value="completedRun.DroneID">
+    <InputSelect id="DroneInput" @bind-Value="_completedRun.DroneID">
         <option value="">-- Select a Drone --</option>
-        @foreach (var drone in droneList)
+        @foreach (var drone in _droneList)
         {
             string displayTag = $"{drone.Name} ({Enums.GetEnumDescription(drone.Size)})";
             <option value="@drone.ID">@displayTag</option>
@@ -37,28 +37,28 @@
     <br /><br />
 
     <label>Input Time: </label>
-    <input type="number" @bind="minutes">
-    <input type="number" @bind="seconds">
-    <input type="number" @bind="milliseconds">
+    <input type="number" @bind="_minutes">
+    <input type="number" @bind="_seconds">
+    <input type="number" @bind="_milliseconds">
     <br /><br />
 
-    <button type="submit" class="btn-outline-primary" disabled="@_isSubmitDisabled">Add Completed Run</button>
+    <button type="submit" class="btn-outline-primary" disabled="@IsSubmitDisabled">Add Completed Run</button>
 </EditForm>
 
 @code {
-    CompletedRun completedRun = new CompletedRun();
-    IList<Map> mapList = [];
-    IList<Drone> droneList = [];
-    private int minutes;
-    private int seconds;
-    private int milliseconds;
-    private TimeSpan CreateTimeSpan() => new TimeSpan(0, 0, minutes, seconds, milliseconds);
+    private readonly CompletedRun _completedRun = new CompletedRun();
+    private IList<Map> _mapList = [];
+    private IList<Drone> _droneList = [];
+    private int _minutes;
+    private int _seconds;
+    private int _milliseconds;
+    private TimeSpan CreateTimeSpan() => new TimeSpan(0, 0, _minutes, _seconds, _milliseconds);
 
     protected override async Task OnInitializedAsync()
     {
-        mapList = await  mapService.GetMaps();
-        droneList = await droneService.GetDrones(currentUser.User);
-        currentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
+        _mapList = await  MapService.GetMaps();
+        _droneList = await DroneService.GetDrones(CurrentUser.User);
+        CurrentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
     }
 
     private void OnCurrentUserChanged(object? sender, EventArgs e)
@@ -68,22 +68,22 @@
 
     public void Dispose()
     {
-        currentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
+        CurrentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
     }
 
-    private bool _isSubmitDisabled =>
-        completedRun.MapID is 0 ||
-        completedRun.DroneID is 0 ||
-        string.IsNullOrWhiteSpace(minutes.ToString()) ||
-        string.IsNullOrWhiteSpace(seconds.ToString()) ||
-        string.IsNullOrWhiteSpace(milliseconds.ToString());
+    private bool IsSubmitDisabled =>
+        _completedRun.MapID is 0 ||
+        _completedRun.DroneID is 0 ||
+        string.IsNullOrWhiteSpace(_minutes.ToString()) ||
+        string.IsNullOrWhiteSpace(_seconds.ToString()) ||
+        string.IsNullOrWhiteSpace(_milliseconds.ToString());
 
 
-    public void HandleSubmit(EditContext editContext)
+    public async Task HandleSubmit(EditContext editContext)
     {
         CompletedRun newCompletedRun = (CompletedRun)editContext.Model;
         newCompletedRun.Time = CreateTimeSpan(); 
-        completedRunService.AddCompletedRun(newCompletedRun, currentUser.User);
-        toastService.ShowSuccess("Completed Run Added!", 5);
+        await CompletedRunService.AddCompletedRun(newCompletedRun, CurrentUser.User);
+        Snackbar.Add("Completed Run Added!", Severity.Success);
     }
 }
