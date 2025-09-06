@@ -2,38 +2,54 @@
 @using FPVDevelopment.Components.Services
 @using FPVDevelopment.Components.Data.Models
 @using static FPVDevelopment.Components.Globals.Enums
-@inject MapService mapService;
+@inject MapService MapService;
+@inject ISnackbar Snackbar
 @rendermode InteractiveServer
 
-<h1>Add a new map to the database.</h1>
-
-<EditForm FormName="AddMapForm" Model="@map" OnSubmit="HandleSubmit">
-    <label for="NameInput">Map Name: </label>
-    <InputText id="NameInput"
-               @bind-Value="@map.Name"/>
-    <br/><br/>
-
-    <label for="DifficultyInput">Map Difficulty: </label>
-    <InputSelect id="DifficultyInput" @bind-Value="@map.Difficulty">
-        @foreach (MapDifficulty difficulty in Enum.GetValues(typeof(MapDifficulty)))
-        {
-            <option value="@difficulty">@difficulty</option>
-        }
-    </InputSelect>
-    <br /><br />
-
-    <button type="submit" class="btn-primary" disabled="@_isSubmitDisabled">Add Map</button>
+<EditForm FormName="AddMapForm" Model="@_map" OnSubmit="@HandleSubmit">
+    <MudGrid Edge="Edge.Start" Class="mr-16">
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Add a new map to the database.</MudText>
+                </MudCardHeader>
+                <MudCardContent Class="p-2 pt-1">
+                    <MudStack Spacing="4">
+                        <MudTextField Label="Map Name" HelperText="Max. 50 characters"
+                                      @bind-Value="@_map.Name"></MudTextField>
+                    </MudStack>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton
+                        ButtonType="ButtonType.Submit"
+                        Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        disabled="@IsSubmitDisabled">
+                        Add Map
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
 </EditForm>
 
 @code {
-    Map map = new Map();
+    private readonly Map _map = new Map();
 
-    private bool _isSubmitDisabled =>
-        string.IsNullOrWhiteSpace(map.Name);
+    private bool IsSubmitDisabled =>
+        string.IsNullOrWhiteSpace(_map.Name);
 
-    public void HandleSubmit(EditContext editContext)
+    private async Task HandleSubmit(EditContext editContext)
     {
-        Map newMap = (Map)editContext.Model;
-        mapService.AddMap(newMap);
+        var newMap = new Map
+        {
+            Name = _map.Name,
+        };
+        
+        var flag = await MapService.AddMap(newMap);
+        if (flag)
+            Snackbar.Add("Map Added!", Severity.Success);
+        else
+            Snackbar.Add("Map Failed To Add", Severity.Error);
     }
 }

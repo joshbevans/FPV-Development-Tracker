@@ -1,0 +1,72 @@
+﻿@page "/AddDrone"
+@using FPVDevelopment.Components.Data.Classes
+@using FPVDevelopment.Components.Data.Models
+@using static FPVDevelopment.Components.Globals.Enums
+@inject DroneService DroneService;
+@inject CurrentUser CurrentUser;
+@inject ISnackbar Snackbar
+@rendermode InteractiveServer
+
+<EditForm FormName="AddDroneForm" Model="@_drone" OnSubmit="@HandleSubmit">
+    <MudGrid Edge="Edge.Start" Class="mr-16">
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Add a new drone to the database.</MudText>
+                </MudCardHeader>
+                <MudCardContent Class="p-2 pt-1">
+                    <MudStack Spacing="4">
+                        <MudTextField Label="Drone Name" HelperText="Max. 20 characters"
+                                      @bind-Value="@_drone.Name"></MudTextField>
+                        <div class="d-flex" style="width:100%">
+                            <MudCheckBox @bind-Value="_isCustom" LabelPlacement="Placement.Start" Label="Is This Drone Custom?"/>
+                        </div>
+                        <MudSelect T="DroneSize" @bind-Value="_drone.Size" Label="Select a Size">
+                            @foreach (DroneSize size in Enum.GetValues(typeof(DroneSize)))
+                            {
+                                <MudSelectItem Value="size">@GetEnumDescription(size)</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudStack>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton
+                        ButtonType="ButtonType.Submit"
+                        Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        disabled="@IsSubmitDisabled">
+                        Add Drone
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    private readonly Drone _drone = new Drone();
+
+    private bool _isCustom = true;
+
+    private bool IsSubmitDisabled =>
+        string.IsNullOrWhiteSpace(_drone.Name);
+
+    private async Task HandleSubmit(EditContext editContext)
+    {
+        var newDrone = new Drone
+        {
+            Name = _drone.Name,
+            Size = _drone.Size
+        };
+        
+        if (_isCustom)
+            newDrone.UserID = CurrentUser?.User?.ID;
+        
+        var flag = await DroneService.AddDrone(newDrone);
+        
+        if(flag)
+            Snackbar.Add("Drone Added!", Severity.Success);
+        else
+            Snackbar.Add("Drone Failed To Add", Severity.Error);
+    }
+}

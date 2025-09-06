@@ -4,23 +4,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FPVDevelopment.Components.Services
 {
-    public class MapService
+    public class DroneService
     {
         private IDbContextFactory<FPVDbContext> _dbContextFactory;
 
-        public MapService(IDbContextFactory<FPVDbContext> dbContextFactory)
+        public DroneService(IDbContextFactory<FPVDbContext> dbContextFactory)
         {
             _dbContextFactory = dbContextFactory;
         }
 
-        public async Task<bool> AddMap(Map map)
+        public async Task<bool> AddDrone(Drone drone)
         {
-            if (map is null)
-                throw new ArgumentNullException(nameof(map));
+            if (drone is null)
+                throw new ArgumentNullException(nameof(drone));
 
             await using (FPVDbContext context = await _dbContextFactory.CreateDbContextAsync())
             {
-                context.Maps.Add(map);
+                context.Drones.Add(drone);
                 try
                 {
                     await context.SaveChangesAsync();
@@ -34,12 +34,16 @@ namespace FPVDevelopment.Components.Services
             }
         }
 
-        public async Task<IList<Map>> GetMaps()
+        public async Task<IList<Drone>> GetDrones(User? user)
         {
+            if (user is null)
+                throw new ArgumentNullException(nameof(user));
+            
             using (FPVDbContext context = await _dbContextFactory.CreateDbContextAsync())
             {
-                return await context.Maps
-                    .Include(m => m.Courses)
+                return await context.Drones
+                    .Include(d => d.User)
+                    .Where(d => d.User == null || d.User.ID == user.ID)
                     .ToListAsync();
             }
         }

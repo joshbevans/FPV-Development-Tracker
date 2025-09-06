@@ -1,0 +1,192 @@
+﻿@page "/History"
+@using FPVDevelopment.Components.Data.Classes
+@using FPVDevelopment.Components.Data.Models
+@using FPVDevelopment.Components.Globals
+@using static FPVDevelopment.Components.Globals.Enums
+@inject CurrentUser CurrentUser
+@inject CompletedRunService CompletedRunService
+@inject DroneService DroneService
+@inject MapService MapService
+@rendermode InteractiveServer
+
+<MudText Typo="Typo.h4" GutterBottom="true" Class="pt-6 px-4">Run History</MudText>
+<MudGrid Edge="Edge.Start" Class="mr-16 pb-4" Style="padding: 0 16px;">
+    <MudItem xs="12" sm="7">
+        <MudCard>
+            <MudCardContent Class="p-4 pt-3">
+
+                <MudGrid Spacing="3">
+                    <MudItem xs="12" sm="6">
+                        <MudSelect T="int?" @bind-Value="_selectedMapId" Label="Filter by Map" Clearable="true">
+                            @foreach (var map in _mapList.OrderBy(m => m.Name))
+                            {
+                                <MudSelectItem @key="map.ID" Value=@((int?)map.ID)>
+                                    @map.Name
+                                </MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6">
+                        <MudSelect T="int?" @bind-Value="_selectedCourseId" Label="Filter by Course" Clearable="true"
+                                   Disabled="@(!_selectedMapId.HasValue)">
+                            @foreach (var course in _mapList
+                                              .Where(m => m.ID == _selectedMapId)
+                                              .SelectMany(m => m.Courses)
+                                              .OrderBy(c => c.Difficulty)
+                                              .ThenBy(c => c.Name))
+                            {
+                                <MudSelectItem @key="course.ID" Value=@((int?)course.ID)>
+                                    @course.Difficulty - @course.Name
+                                </MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                </MudGrid>
+
+                <MudGrid Spacing="3" Class="mt-2">
+                    <MudItem xs="12" sm="6">
+                        <MudSelect T="Difficulty?" @bind-Value="_selectedDifficulty" Label="Filter by Difficulty" Clearable="true">
+                            @foreach (var difficulty in Enum.GetValues<Difficulty>())
+                            {
+                                <MudSelectItem @key="difficulty" Value=@((Difficulty?)difficulty)>
+                                    @GetEnumDescription(difficulty)
+                                </MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6">
+                        <MudSelect T="DroneSize?" @bind-Value="_selectedDroneSize" Label="Filter by Size" Clearable="true">
+                            @foreach (DroneSize size in Enum.GetValues(typeof(DroneSize)))
+                            {
+                                <MudSelectItem @key="size" Value=@((DroneSize?)size)>
+                                    @GetEnumDescription(size)
+                                </MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                </MudGrid>
+
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+
+<div style="max-height: calc(100vh - 150px); overflow-y: auto; padding: 0 16px;">
+    <MudGrid Spacing="2" Direction="Column">
+        @foreach (var run in FilteredRuns.OrderByDescending(r => r.Date))
+{
+    var courseRunsWithTime = _completedRunList
+        .Where(r2 => r2.CourseID == run.CourseID && r2.Time.HasValue)
+        .OrderBy(r2 => r2.Time.Value)
+        .ToList();
+
+    var isBestRun = run.Time.HasValue && courseRunsWithTime.FirstOrDefault() == run;
+
+    TimeSpan? improvement = null;
+    if (isBestRun && courseRunsWithTime.Count > 1)
+    {
+        improvement = courseRunsWithTime[1].Time - run.Time;
+    }
+
+    var diffTextColor = isBestRun ? "green" : "red";
+    var diffTextStyle = $"color:{diffTextColor};";
+    var cardStyle = isBestRun ? "width:100%; border:2px solid gold;" : "width:100%;";
+
+    <MudItem xs="12">
+        <MudCard Style="@cardStyle">
+            <MudCardContent>
+                <MudGrid Style="margin-bottom:4px;">
+                    <MudItem xs="8">
+                        <MudText Typo="Typo.h6">
+                            @run.Course.Map.Name - @run.Course.Name (@run.Course.Difficulty)
+                        </MudText>
+                    </MudItem>
+                    <MudItem xs="4" Class="d-flex justify-end">
+                        <MudText Typo="Typo.body2">@run.Date.ToShortDateString()</MudText>
+                    </MudItem>
+                </MudGrid>
+
+                <MudText Style="margin-bottom:4px;">
+                    Drone: @run.Drone.Name (@Enums.GetEnumDescription(run.Drone.Size))
+                </MudText>
+
+                <MudGrid>
+                    <MudItem xs="8">
+                        <MudText Style="@diffTextStyle">
+                            @if (isBestRun)
+                            {
+                                if (improvement.HasValue)
+                                {
+                                    @($"New personal best! Improved by: -{improvement.Value.TotalSeconds:F3}s")
+                                }
+                                else
+                                {
+                                    @("New personal best!")
+                                }
+                            }
+                            else
+                            {
+                                @(run.Time.HasValue ? $"+{(run.Time.Value - _bestTimesPerCourse[run.CourseID]).TotalSeconds:F3}s" : "N/A")
+                            }
+                        </MudText>
+                    </MudItem>
+                    <MudItem xs="4" Class="d-flex justify-end">
+                        <MudText>
+                            Time: @(run.Time.HasValue ? run.Time.Value.ToString(@"mm\:ss\.fff") : "N/A")
+                        </MudText>
+                    </MudItem>
+                </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+}
+
+    </MudGrid>
+</div>
+
+@code{
+    private IList<Map> _mapList = [];
+    private IList<Drone> _droneList = [];
+    private IList<CompletedRun> _completedRunList = [];
+    private Dictionary<int, TimeSpan> _bestTimesPerCourse = new();
+
+    private int? _selectedMapId;
+    private int? _selectedCourseId;
+    private DroneSize? _selectedDroneSize;
+    private Difficulty? _selectedDifficulty;
+    
+    private IEnumerable<CompletedRun> FilteredRuns => _completedRunList
+        .Where(r => !_selectedMapId.HasValue || r.Course.MapID == _selectedMapId)
+        .Where(r => !_selectedCourseId.HasValue || r.CourseID == _selectedCourseId)
+        .Where(r => !_selectedDroneSize.HasValue || r.Drone.Size == _selectedDroneSize)
+        .Where(r => !_selectedDifficulty.HasValue || r.Course.Difficulty == _selectedDifficulty);
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _mapList = await  MapService.GetMaps();
+        _completedRunList = await CompletedRunService.GetCompletedRuns(CurrentUser.User);
+        CurrentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
+        
+        _bestTimesPerCourse = _completedRunList
+            .Where(r => r.Time.HasValue)
+            .GroupBy(r => r.CourseID)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Min(r => r.Time.Value)
+            );
+    }
+
+    private void OnCurrentUserChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        CurrentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
+    }
+}

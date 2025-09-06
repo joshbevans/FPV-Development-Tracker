@@ -1,0 +1,141 @@
+﻿@page "/AddCompletedRun"
+@using FPVDevelopment.Components.Data.Classes
+@using FPVDevelopment.Components.Data.Models
+@using FPVDevelopment.Components.Globals
+@inject CompletedRunService CompletedRunService;
+@inject CourseService CourseService;
+@inject MapService MapService
+@inject DroneService DroneService;
+@inject CurrentUser CurrentUser;
+@inject ISnackbar Snackbar
+@rendermode InteractiveServer
+
+<EditForm FormName="AddCompletedRunForm" Model="@_completedRun" OnSubmit="@HandleSubmit">
+    <MudGrid Edge="Edge.Start" Class="mr-16">
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Add a new completed run to the database.</MudText>
+                </MudCardHeader>
+                <MudCardContent Class="p-2 pt-1">
+                    <MudStack Spacing="4">
+                        <MudSelect  @bind-Value="@_map.ID" Label="Select a Map">
+                            @foreach (var map in _mapList
+                                          .OrderBy(m => m.Name))
+                            {
+                                <MudSelectItem Value="@map.ID">@map.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudSelect  @bind-Value="@_completedRun.CourseID" Label="Select a Course">
+                            @foreach (var course in _courseList
+                                          .Where(c => c.MapID == _map.ID)
+                                          .OrderBy(c => c.Difficulty)
+                                          .ThenBy(c => c.Name))
+                            {
+                                <MudSelectItem Value="@course.ID">@course.Difficulty - @course.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudSelect  @bind-Value="@_completedRun.DroneID" Label="Select a Drone">
+                            @foreach (var drone in _droneList
+                                          .OrderBy(d => d.Size)
+                                          .ThenBy(d => d.Name))
+                            {
+                                string displayTag = $"{drone.Name} ({Enums.GetEnumDescription(drone.Size)})";
+                                <MudSelectItem Value="@drone.ID">@displayTag</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudGrid Spacing="3">
+                            <MudItem xs="4">
+                            <MudNumericField T="int"
+                                             Label="Minutes"
+                                             Variant="Variant.Outlined"
+                                             Min="0"
+                                             Max="59"
+                                             @bind-Value="_minutes"/>
+                            </MudItem>
+                            <MudItem xs="4">
+                            <MudNumericField T="int"
+                                             Label="Seconds"
+                                             Variant="Variant.Outlined"
+                                             Min="0"
+                                             Max="59"
+                                             @bind-Value="_seconds"/>
+                            </MudItem>
+                            <MudItem xs="4">
+                            <MudNumericField T="int"
+                                             Label="Milliseconds"
+                                             Variant="Variant.Outlined"
+                                             Min="0"
+                                             Max="999"
+                                             @bind-Value="_milliseconds"/>
+                            </MudItem>
+                        </MudGrid>
+                    </MudStack>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton
+                        ButtonType="ButtonType.Submit"
+                        Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        disabled="@IsSubmitDisabled">
+                        Add Completed Run
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    private readonly CompletedRun _completedRun = new CompletedRun();
+    private IList<Course> _courseList = [];
+    private IList<Map> _mapList = [];
+    private IList<Drone> _droneList = [];
+    private Map _map = new Map();
+    private int _minutes;
+    private int _seconds;
+    private int _milliseconds;
+    private TimeSpan CreateTimeSpan() => new TimeSpan(0, 0, _minutes, _seconds, _milliseconds);
+
+    protected override async Task OnInitializedAsync()
+    {
+        _mapList = await MapService.GetMaps();
+        _courseList = await CourseService.GetCourses();
+        _droneList = await DroneService.GetDrones(CurrentUser.User);
+        CurrentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
+    }
+
+    private void OnCurrentUserChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void Dispose()
+    {
+        CurrentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
+    }
+
+    private bool IsSubmitDisabled =>
+        _completedRun.CourseID is 0 ||
+        _completedRun.DroneID is 0 ||
+        string.IsNullOrWhiteSpace(_minutes.ToString()) ||
+        string.IsNullOrWhiteSpace(_seconds.ToString()) ||
+        string.IsNullOrWhiteSpace(_milliseconds.ToString());
+
+
+    private async Task HandleSubmit(EditContext editContext)
+    {
+        var newCompletedRun = new CompletedRun()
+        {
+            Time = CreateTimeSpan(),
+            CourseID = _completedRun.CourseID,
+            DroneID = _completedRun.DroneID
+        };
+        
+        var flag = await CompletedRunService.AddCompletedRun(newCompletedRun, CurrentUser.User);
+        if (flag)
+            Snackbar.Add("Completed Run Added!", Severity.Success);
+        else
+            Snackbar.Add("Failed To Add Completed Run", Severity.Error);
+    }
+}

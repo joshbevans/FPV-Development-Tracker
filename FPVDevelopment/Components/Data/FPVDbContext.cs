@@ -13,6 +13,7 @@ namespace FPVDevelopment.Components.Data
         }
 
         public DbSet<CompletedRun> CompletedRuns { get; set; }
+        public DbSet<Course> Courses { get; set; }
         public DbSet<Drone> Drones { get; set; }
         public DbSet<Map> Maps { get; set; }
         public DbSet<User> Users { get; set; }

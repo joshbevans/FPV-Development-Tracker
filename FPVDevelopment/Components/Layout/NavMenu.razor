@@ -1,24 +1,35 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">FPVDevelopment</a>
-    </div>
-</div>
+﻿@using FPVDevelopment.Components.Data.Classes
+@using FPVDevelopment.Components.Data.Models
+@inject CurrentUser CurrentUser
+@rendermode InteractiveServer
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
+<MudNavMenu>
+    <MudNavLink Href="/" Icon="@Icons.Material.Filled.Person" Match="NavLinkMatch.All">Account</MudNavLink>
+    <MudNavLink Href="/History" Icon="@Icons.Material.Filled.History" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">History</MudNavLink>
+    <MudNavLink Href="/AddCompletedRun" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">Add Completed Run</MudNavLink>
+    <MudNavLink Href="/AddMap" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">Add Map</MudNavLink>
+    <MudNavLink Href="/AddCourse" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">Add Course</MudNavLink>
+    <MudNavLink Href="/AddDrone" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">Add Drone</MudNavLink>
+</MudNavMenu>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="AddMap">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Add Map
-            </NavLink>
-        </div>
-    </nav>
-</div>
 
+@code {
+    protected override void OnInitialized()
+    {
+        CurrentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
+    }
+
+    private void OnCurrentUserChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        CurrentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
+    }
+
+    private bool IsNavHidden =>
+        CurrentUser.User is null;
+}

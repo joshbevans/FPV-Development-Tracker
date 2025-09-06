@@ -1,8 +1,53 @@
 ﻿@page "/"
-@using FPVDevelopment.Components.Services
+@using FPVDevelopment.Components.Data.Classes
+@inject UserService UserService
+@inject CurrentUser CurrentUser
+@inject ISnackbar Snackbar
+@rendermode InteractiveServer
 
-<PageTitle>Home</PageTitle>
+<MudStack Edge="Edge.Start" Class="pa-4 mr-16">
+    <label>Logged in as @CurrentUser.User?.DisplayName</label>
+    <MudButton
+        hidden="@IsUserLoggedIn"
+        FullWidth="false"
+        Style="width: 200px;"
+        Variant="Variant.Filled"
+        Color="Color.Primary"
+        @onclick="HandleLoginUser">
+        Login
+    </MudButton>
+</MudStack>
 
-<h1>FPV Development Tracker!</h1>
+@code {
+    
+    protected override void OnInitialized()
+    {
+        CurrentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
+    }
 
+    private void OnCurrentUserChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
 
+    public void Dispose()
+    {
+        CurrentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
+    }
+
+    private bool IsUserLoggedIn =>
+        CurrentUser.User is not null;
+        
+    private async Task HandleLoginUser()
+    {
+        CurrentUser.SetCurrentUser(await UserService.Login("user", "pass"));
+        if (CurrentUser is not null)
+        {
+            Snackbar.Add("Login Successful!", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Login Failed!", Severity.Error);
+        }
+    }
+}

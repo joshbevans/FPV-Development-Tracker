@@ -4,6 +4,7 @@ using FPVDevelopment.Components.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FPVDevelopment.Migrations
 {
     [DbContext(typeof(FPVDbContext))]
-    partial class FPVDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250902133757_add_drone_owner_column")]
+    partial class add_drone_owner_column
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,13 +33,16 @@ namespace FPVDevelopment.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<int>("CourseID")
+                    b.Property<int?>("CrashCount")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("DroneID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MapID")
                         .HasColumnType("int");
 
                     b.Property<TimeSpan?>("Time")
@@ -47,39 +53,13 @@ namespace FPVDevelopment.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("CourseID");
-
                     b.HasIndex("DroneID");
+
+                    b.HasIndex("MapID");
 
                     b.HasIndex("UserID");
 
                     b.ToTable("CompletedRuns");
-                });
-
-            modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Course", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<int>("Difficulty")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MapID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("MapID");
-
-                    b.ToTable("Courses");
                 });
 
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Drone", b =>
@@ -110,18 +90,21 @@ namespace FPVDevelopment.Migrations
 
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Map", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("MapID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MapID"));
+
+                    b.Property<int>("Difficulty")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.HasKey("ID");
+                    b.HasKey("MapID");
 
                     b.ToTable("Maps");
                 });
@@ -155,15 +138,15 @@ namespace FPVDevelopment.Migrations
 
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.CompletedRun", b =>
                 {
-                    b.HasOne("FPVDevelopment.Components.Data.Models.Course", "Course")
-                        .WithMany("CompletedRuns")
-                        .HasForeignKey("CourseID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("FPVDevelopment.Components.Data.Models.Drone", "Drone")
                         .WithMany("CompletedRuns")
                         .HasForeignKey("DroneID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FPVDevelopment.Components.Data.Models.Map", "Map")
+                        .WithMany("CompletedRuns")
+                        .HasForeignKey("MapID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -173,22 +156,11 @@ namespace FPVDevelopment.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Course");
-
                     b.Navigation("Drone");
 
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Course", b =>
-                {
-                    b.HasOne("FPVDevelopment.Components.Data.Models.Map", "Map")
-                        .WithMany("Courses")
-                        .HasForeignKey("MapID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Map");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Drone", b =>
@@ -200,11 +172,6 @@ namespace FPVDevelopment.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Course", b =>
-                {
-                    b.Navigation("CompletedRuns");
-                });
-
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Drone", b =>
                 {
                     b.Navigation("CompletedRuns");
@@ -212,7 +179,7 @@ namespace FPVDevelopment.Migrations
 
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Map", b =>
                 {
-                    b.Navigation("Courses");
+                    b.Navigation("CompletedRuns");
                 });
 
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.User", b =>
