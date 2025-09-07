@@ -6,7 +6,10 @@
 
 <MudNavMenu>
     <MudNavLink Href="/" Icon="@Icons.Material.Filled.Person" Match="NavLinkMatch.All">Account</MudNavLink>
+    <MudDivider/>
     <MudNavLink Href="/History" Icon="@Icons.Material.Filled.History" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">History</MudNavLink>
+    <MudNavLink Href="/Analytics" Icon="@Icons.Material.Filled.Analytics" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">Analytics</MudNavLink>
+    <MudDivider/>
     <MudNavLink Href="/AddCompletedRun" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">Add Completed Run</MudNavLink>
     <MudNavLink Href="/AddMap" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">Add Map</MudNavLink>
     <MudNavLink Href="/AddCourse" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">Add Course</MudNavLink>
