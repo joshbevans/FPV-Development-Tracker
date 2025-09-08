@@ -34,14 +34,22 @@ namespace FPVDevelopment.Components.Services
             }
         }
 
-        public async Task<IList<Map>> GetMaps()
+        public async Task<IList<Map>> GetMaps(User? user = null)
         {
-            using (FPVDbContext context = await _dbContextFactory.CreateDbContextAsync())
+            using var context = await _dbContextFactory.CreateDbContextAsync();
+
+            if (user is null)
             {
                 return await context.Maps
                     .Include(m => m.Courses)
                     .ToListAsync();
             }
+
+            return await context.Maps
+                .Where(m => m.Courses
+                    .Any(c => c.CompletedRuns.Any(r => r.UserID == user.ID)))
+                .Include(m => m.Courses) // include courses for checkbox display
+                .ToListAsync();
         }
     }
 }

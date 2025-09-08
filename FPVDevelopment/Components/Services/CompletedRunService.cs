@@ -13,7 +13,7 @@ namespace FPVDevelopment.Components.Services
             _dbContextFactory = dbContextFactory;
         }
 
-        public async Task<bool> AddCompletedRun(CompletedRun completedRun, User user)
+        public async Task<bool> AddCompletedRun(CompletedRun? completedRun, User? user)
         {
             if (completedRun is null)
                 throw new ArgumentNullException(nameof(completedRun));

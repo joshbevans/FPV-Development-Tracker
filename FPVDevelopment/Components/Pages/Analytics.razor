@@ -1,5 +1,123 @@
-<h3>Analytics</h3>
+@page "/Analytics"
+@inject CompletedRunService CompletedRunService
+@inject CurrentUser CurrentUser
+
+<h3>Progression Over Time</h3>
+@if (_configByDate != null)
+{
+    <Chart Config="_configByDate" Style="max-width:900px; margin:auto;" />
+}
+else
+{
+    <p>No data available.</p>
+}
+
+<h3>Progression by Attempt</h3>
+@if (_configByAttempt != null)<h3>Progression Over Time</h3>
+@if (_configByDate != null)
+{
+    <div style="max-width:900px; margin:auto;">
+        <Chart Config="_configByDate" />
+    </div>
+}
+else
+{
+    <p>No data available.</p>
+}
+
+<h3>Progression by Attempt</h3>
+@if (_configByAttempt != null)
+{
+    <div style="max-width:900px; margin:auto;">
+        <Chart Config="_configByAttempt" />
+    </div>
+}
+else
+{
+    <p>No data available.</p>
+}
+}
 
 @code {
-    
+    private LineConfig _configByDate;
+    private LineConfig _configByAttempt;
+
+    private IList<CompletedRun> _completedRuns = new List<CompletedRun>();
+    private readonly string[] _colors = new[] { "#e6194b", "#3cb44b", "#ffe119", "#4363d8" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _completedRuns = (await CompletedRunService.GetCompletedRuns(CurrentUser.User))?.ToList() ?? new List<CompletedRun>();
+        BuildCharts();
+    }
+
+    private void BuildCharts()
+    {
+        if (!_completedRuns.Any())
+        {
+            _configByDate = null;
+            _configByAttempt = null;
+            return;
+        }
+
+        var courses = _completedRuns.Select(r => r.CourseID).Distinct().ToList();
+
+        // -------- Progression Over Time --------
+        var dates = _completedRuns.Select(r => r.Date.Date).Distinct().OrderBy(d => d).ToList();
+        var dateLabels = dates.Select(d => d.ToString("dd MMM yyyy")).ToList();
+
+        _configByDate = new LineConfig
+        {
+            Options = new LineOptions { Responsive = true }
+        };
+
+        foreach (var label in dateLabels)
+            _configByDate.Data.Labels.Add(label);
+
+        int colorIndex = 0;
+        foreach (var courseId in courses)
+        {
+            var runs = _completedRuns.Where(r => r.CourseID == courseId).ToList();
+            var data = dates.Select(d => runs.FirstOrDefault(r => r.Date.Date == d)?.Time?.TotalSeconds ?? 0).ToList();
+
+            var dataset = new LineDataset<double>(data)
+            {
+                Label = $"Course {courseId}",
+                BorderColor = _colors[colorIndex % _colors.Length],
+                Fill = false
+            };
+
+            _configByDate.Data.Datasets.Add(dataset);
+            colorIndex++;
+        }
+
+        // -------- Progression by Attempt --------
+        var attempts = _completedRuns.Select((r, i) => i + 1).ToList();
+        var attemptLabels = attempts.Select(a => $"Attempt {a}").ToList();
+
+        _configByAttempt = new LineConfig
+        {
+            Options = new LineOptions { Responsive = true }
+        };
+
+        foreach (var label in attemptLabels)
+            _configByAttempt.Data.Labels.Add(label);
+
+        colorIndex = 0;
+        foreach (var courseId in courses)
+        {
+            var runs = _completedRuns.Where(r => r.CourseID == courseId).OrderBy(r => r.Date).ToList();
+            var data = runs.Select(r => r.Time?.TotalSeconds ?? 0).ToList();
+
+            var dataset = new LineDataset<double>(data)
+            {
+                Label = $"Course {courseId}",
+                BorderColor = _colors[colorIndex % _colors.Length],
+                Fill = false
+            };
+
+            _configByAttempt.Data.Datasets.Add(dataset);
+            colorIndex++;
+        }
+    }
 }
