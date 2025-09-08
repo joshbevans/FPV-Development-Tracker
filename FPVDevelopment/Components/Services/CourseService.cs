@@ -34,12 +34,21 @@ public class CourseService
         }
     }
 
-    public async Task<IList<Course>> GetCourses()
+    public async Task<IList<Course>> GetCourses(User? user = null)
     {
-        using (FPVDbContext context = await _dbContextFactory.CreateDbContextAsync())
+        using var context = await _dbContextFactory.CreateDbContextAsync();
+
+        if (user is null)
         {
             return await context.Courses
+                .Include(c => c.Map) // optional if you need map info
                 .ToListAsync();
         }
+
+        return await context.Courses
+            .Where(c => c.CompletedRuns.Any(r => r.UserID == user.ID))
+            .Include(c => c.Map)
+            .ToListAsync();
     }
+
 }

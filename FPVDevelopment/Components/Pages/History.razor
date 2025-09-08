@@ -167,7 +167,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _mapList = await  MapService.GetMaps();
+        _mapList = await MapService.GetMaps();
         _completedRunList = await CompletedRunService.GetCompletedRuns(CurrentUser.User);
         CurrentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
         

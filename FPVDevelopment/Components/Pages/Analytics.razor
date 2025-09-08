@@ -1,0 +1,181 @@
+@page "/Analytics"
+@inject CompletedRunService CompletedRunService
+@inject CurrentUser CurrentUser
+
+@if (_configByDate != null)
+{
+    <MudCard Style="width:100%; margin-bottom:20px;">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Progression Over Time</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <div style="width:100%;">
+                <Chart Config="_configByDate"/>
+            </div>
+        </MudCardContent>
+    </MudCard>
+}
+else
+{
+    <p>No data available.</p>
+}
+
+@if (_configByAttempt != null)
+{
+    <MudCard Style="width:100%; margin-bottom:20px;">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Progression by Attempt</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <div style="width:100%;">
+                <Chart Config="_configByAttempt"/>
+            </div>
+        </MudCardContent>
+    </MudCard>
+}
+else
+{
+    <p>No data available.</p>
+}
+
+
+@code {
+    private LineConfig _configByDate;
+    private LineConfig _configByAttempt;
+
+    private IList<CompletedRun> _completedRuns = new List<CompletedRun>();
+    private readonly string[] _colors = new[] { 
+        "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231", 
+        "#911eb4", "#46f0f0", "#f032e6", "#bcf60c", "#fabebe", 
+        "#008080", "#e6beff", "#9a6324", "#fffac8", "#800000", 
+        "#aaffc3", "#808000", "#ffd8b1", "#000075", "#808080" 
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _completedRuns = (await CompletedRunService.GetCompletedRuns(CurrentUser.User))?.ToList() ?? new List<CompletedRun>();
+        BuildCharts();
+    }
+
+    private void BuildCharts()
+    {
+        if (!_completedRuns.Any())
+        {
+            _configByDate = null;
+            _configByAttempt = null;
+            return;
+        }
+
+        List<Course> courses = _completedRuns.Select(r => r.Course).Distinct().ToList();
+
+        // -------- Progression Over Time --------
+        var dates = _completedRuns.Select(r => r.Date.Date).Distinct().OrderBy(d => d).ToList();
+        var dateLabels = dates.Select(d => d.ToString("dd MMM yyyy")).ToList();
+
+        _configByDate = new LineConfig
+        {
+            Options = new LineOptions
+            {
+                Responsive = true,
+                Scales = new Scales
+                {
+                    YAxes = new List<CartesianAxis>
+                    {
+                        new LinearCartesianAxis
+                        {
+                            ScaleLabel = new ScaleLabel
+                            {
+                                Display = true,
+                                LabelString = "Time (seconds)"
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        foreach (var label in dateLabels)
+            _configByDate.Data.Labels.Add(label);
+
+        int colorIndex = 0;
+        foreach (var course in courses)
+        {
+            var runs = _completedRuns
+                .Where(r => r.Course == course)
+                .OrderBy(r => r.Date)
+                .ToList();
+
+            double lastValue = runs.FirstOrDefault()?.Time?.TotalSeconds ?? 0;
+
+            var data = new List<double>();
+            foreach (var date in dates)
+            {
+                var run = runs.FirstOrDefault(r => r.Date.Date == date);
+                if (run != null && run.Time.HasValue)
+                    lastValue = run.Time.Value.TotalSeconds;
+
+                data.Add(lastValue);
+            }
+
+            var dataset = new LineDataset<double>(data)
+            {
+                Label = course.Name,
+                BorderColor = _colors[colorIndex % _colors.Length],
+                Fill = false
+            };
+
+            _configByDate.Data.Datasets.Add(dataset);
+            colorIndex++;
+        }
+
+        // -------- Progression by Attempt --------
+        int maxAttempts = _completedRuns
+            .GroupBy(r => r.Course)
+            .Max(g => g.Count());
+        var attemptLabels = Enumerable.Range(1, maxAttempts)
+            .Select(a => $"Attempt {a}")
+            .ToList();
+
+        _configByAttempt = new LineConfig
+        {
+            Options = new LineOptions
+            {
+                Responsive = true,
+                Scales = new Scales
+                {
+                    YAxes = new List<CartesianAxis>
+                    {
+                        new LinearCartesianAxis
+                        {
+                            ScaleLabel = new ScaleLabel
+                            {
+                                Display = true,
+                                LabelString = "Time (seconds)"
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        foreach (var label in attemptLabels)
+            _configByAttempt.Data.Labels.Add(label);
+
+        colorIndex = 0;
+        foreach (var course in courses)
+        {
+            var runs = _completedRuns.Where(r => r.Course == course).OrderBy(r => r.Date).ToList();
+            var data = runs.Select(r => r.Time?.TotalSeconds ?? 0).ToList();
+
+            var dataset = new LineDataset<double>(data)
+            {
+                Label = course.Name,
+                BorderColor = _colors[colorIndex % _colors.Length],
+                Fill = false
+            };
+
+            _configByAttempt.Data.Datasets.Add(dataset);
+            colorIndex++;
+        }
+    }
+}
