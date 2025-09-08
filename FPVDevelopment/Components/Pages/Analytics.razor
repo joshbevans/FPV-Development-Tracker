@@ -2,29 +2,42 @@
 @inject CompletedRunService CompletedRunService
 @inject CurrentUser CurrentUser
 
-<h3>Progression Over Time</h3>
 @if (_configByDate != null)
 {
-    <div style="max-width:900px; margin:auto;">
-        <Chart Config="_configByDate" />
-    </div>
+    <MudCard Style="width:100%; margin-bottom:20px;">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Progression Over Time</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <div style="width:100%;">
+                <Chart Config="_configByDate"/>
+            </div>
+        </MudCardContent>
+    </MudCard>
 }
 else
 {
     <p>No data available.</p>
 }
 
-<h3>Progression by Attempt</h3>
 @if (_configByAttempt != null)
 {
-    <div style="max-width:900px; margin:auto;">
-        <Chart Config="_configByAttempt" />
-    </div>
+    <MudCard Style="width:100%; margin-bottom:20px;">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Progression by Attempt</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <div style="width:100%;">
+                <Chart Config="_configByAttempt"/>
+            </div>
+        </MudCardContent>
+    </MudCard>
 }
 else
 {
     <p>No data available.</p>
 }
+
 
 @code {
     private LineConfig _configByDate;
@@ -75,7 +88,6 @@ else
                 .OrderBy(r => r.Date)
                 .ToList();
 
-            // Start with the first value if it exists, otherwise 0
             double lastValue = runs.FirstOrDefault()?.Time?.TotalSeconds ?? 0;
 
             var data = new List<double>();
@@ -85,7 +97,6 @@ else
                 if (run != null && run.Time.HasValue)
                     lastValue = run.Time.Value.TotalSeconds;
 
-                // Add the last known value, even if no run exists for this date
                 data.Add(lastValue);
             }
 
@@ -100,9 +111,7 @@ else
             colorIndex++;
         }
 
-
         // -------- Progression by Attempt --------
-        var attempts = _completedRuns.Select((r, i) => i + 1).ToList();
         int maxAttempts = _completedRuns
             .GroupBy(r => r.Course)
             .Max(g => g.Count());
