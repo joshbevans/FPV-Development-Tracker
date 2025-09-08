@@ -19,8 +19,8 @@ You can view your completed runs, and it will highlight your best runs. It also 
 ## Visualise your progression!
 The tracker also allows you to visualise your improvement over time and attempts.
 
-### Improvement Over Time
-See how your performance improves over time, helping you spot trends and progress.  
+### Progression Over Time
+See how your runs improve over time, helping you spot trends and progress.  
 ![Improvement Over Time](https://github.com/joshbevans/FPV-Development-Tracker/blob/development/DemoImages/graph1.png)
 
 ### Progression Over Attempt Count
