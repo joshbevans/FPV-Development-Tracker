@@ -74,7 +74,24 @@ else
 
         _configByDate = new LineConfig
         {
-            Options = new LineOptions { Responsive = true }
+            Options = new LineOptions
+            {
+                Responsive = true,
+                Scales = new Scales
+                {
+                    YAxes = new List<CartesianAxis>
+                    {
+                        new LinearCartesianAxis
+                        {
+                            ScaleLabel = new ScaleLabel
+                            {
+                                Display = true,
+                                LabelString = "Time (seconds)"
+                            }
+                        }
+                    }
+                }
+            }
         };
 
         foreach (var label in dateLabels)
@@ -121,7 +138,24 @@ else
 
         _configByAttempt = new LineConfig
         {
-            Options = new LineOptions { Responsive = true }
+            Options = new LineOptions
+            {
+                Responsive = true,
+                Scales = new Scales
+                {
+                    YAxes = new List<CartesianAxis>
+                    {
+                        new LinearCartesianAxis
+                        {
+                            ScaleLabel = new ScaleLabel
+                            {
+                                Display = true,
+                                LabelString = "Time (seconds)"
+                            }
+                        }
+                    }
+                }
+            }
         };
 
         foreach (var label in attemptLabels)
