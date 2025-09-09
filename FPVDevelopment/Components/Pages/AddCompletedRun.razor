@@ -99,17 +99,6 @@
         _mapList = await MapService.GetMaps();
         _courseList = await CourseService.GetCourses();
         _droneList = await DroneService.GetDrones(CurrentUser.User);
-        CurrentUser.CurrentUserChangedEvent += OnCurrentUserChanged;
-    }
-
-    private void OnCurrentUserChanged(object? sender, EventArgs e)
-    {
-        InvokeAsync(StateHasChanged);
-    }
-
-    private void Dispose()
-    {
-        CurrentUser.CurrentUserChangedEvent -= OnCurrentUserChanged;
     }
 
     private bool IsSubmitDisabled =>
