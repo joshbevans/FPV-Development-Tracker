@@ -48,7 +48,8 @@ namespace FPVDevelopment.Components.Services
             return await context.Maps
                 .Where(m => m.Courses
                     .Any(c => c.CompletedRuns.Any(r => r.UserID == user.ID)))
-                .Include(m => m.Courses) // include courses for checkbox display
+                .Include(m => m.Courses)
+                .Include(m => m.Sim)
                 .ToListAsync();
         }
     }

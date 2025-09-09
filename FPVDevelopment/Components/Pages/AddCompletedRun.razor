@@ -4,6 +4,7 @@
 @inject MapService MapService
 @inject DroneService DroneService;
 @inject CurrentUser CurrentUser;
+@inject SimService SimService;
 @inject ISnackbar Snackbar
 @rendermode InteractiveServer
 
@@ -16,55 +17,60 @@
                 </MudCardHeader>
                 <MudCardContent Class="p-2 pt-1">
                     <MudStack Spacing="4">
-                        <MudSelect  @bind-Value="@_map.ID" Label="Select a Map">
+                        <MudSelect T="int"
+                                   Value="@_completedRun.DroneID"
+                                   ValueChanged="OnDroneChanged"
+                                   Label="Select a Drone">
+                            @foreach (var drone in _droneList
+                                          .OrderBy(d => d.Size)
+                                          .ThenBy(d => d.Name))
+                            {
+                                string displayTag = $"{drone.Name} ({Enums.GetEnumDescription(drone.Size)}) - {drone.Sim.Name}";
+                                <MudSelectItem Value="@drone.ID">@displayTag</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                        <MudSelect @bind-Value="@_selectedMap.ID" Label="Select a Map">
                             @foreach (var map in _mapList
+                                          .Where(m => m.SimID == _selectedSimID)
                                           .OrderBy(m => m.Name))
                             {
                                 <MudSelectItem Value="@map.ID">@map.Name</MudSelectItem>
                             }
                         </MudSelect>
-                        <MudSelect  @bind-Value="@_completedRun.CourseID" Label="Select a Course">
+                        <MudSelect @bind-Value="@_completedRun.CourseID" Label="Select a Course">
                             @foreach (var course in _courseList
-                                          .Where(c => c.MapID == _map.ID)
+                                          .Where(c => c.MapID == _selectedMap.ID)
                                           .OrderBy(c => c.Difficulty)
                                           .ThenBy(c => c.Name))
                             {
                                 <MudSelectItem Value="@course.ID">@course.Difficulty - @course.Name</MudSelectItem>
                             }
                         </MudSelect>
-                        <MudSelect  @bind-Value="@_completedRun.DroneID" Label="Select a Drone">
-                            @foreach (var drone in _droneList
-                                          .OrderBy(d => d.Size)
-                                          .ThenBy(d => d.Name))
-                            {
-                                string displayTag = $"{drone.Name} ({Enums.GetEnumDescription(drone.Size)})";
-                                <MudSelectItem Value="@drone.ID">@displayTag</MudSelectItem>
-                            }
-                        </MudSelect>
                         <MudGrid Spacing="3">
                             <MudItem xs="4">
-                            <MudNumericField T="int"
-                                             Label="Minutes"
-                                             Variant="Variant.Outlined"
-                                             Min="0"
-                                             Max="59"
-                                             @bind-Value="_minutes"/>
+                                <MudNumericField T="int"
+                                                 Label="Minutes"
+                                                 Variant="Variant.Outlined"
+                                                 Min="0"
+                                                 Max="59"
+                                                 @bind-Value="_minutes"/>
                             </MudItem>
                             <MudItem xs="4">
-                            <MudNumericField T="int"
-                                             Label="Seconds"
-                                             Variant="Variant.Outlined"
-                                             Min="0"
-                                             Max="59"
-                                             @bind-Value="_seconds"/>
+                                <MudNumericField T="int"
+                                                 Label="Seconds"
+                                                 Variant="Variant.Outlined"
+                                                 Min="0"
+                                                 Max="59"
+                                                 @bind-Value="_seconds"/>
                             </MudItem>
                             <MudItem xs="4">
-                            <MudNumericField T="int"
-                                             Label="Milliseconds"
-                                             Variant="Variant.Outlined"
-                                             Min="0"
-                                             Max="999"
-                                             @bind-Value="_milliseconds"/>
+                                <MudNumericField T="int"
+                                                 Label="Milliseconds"
+                                                 Variant="Variant.Outlined"
+                                                 Min="0"
+                                                 Max="999"
+                                                 @bind-Value="_milliseconds"/>
                             </MudItem>
                         </MudGrid>
                     </MudStack>
@@ -88,7 +94,8 @@
     private IList<Course> _courseList = [];
     private IList<Map> _mapList = [];
     private IList<Drone> _droneList = [];
-    private Map _map = new Map();
+    private Map _selectedMap = new Map();
+    private int _selectedSimID = 0;
     private int _minutes;
     private int _seconds;
     private int _milliseconds;
@@ -100,6 +107,21 @@
         _courseList = await CourseService.GetCourses();
         _droneList = await DroneService.GetDrones(CurrentUser.User);
     }
+    
+    private async Task OnDroneChanged(int droneID)
+    {
+        _completedRun.DroneID = droneID;
+
+        Drone selectedDrone = _droneList.FirstOrDefault(d => d.ID == droneID);
+        
+        _selectedSimID = selectedDrone.SimID;
+
+        _selectedMap.ID = 0;
+        _completedRun.CourseID = 0;
+        
+        await InvokeAsync(StateHasChanged);
+    }
+
 
     private bool IsSubmitDisabled =>
         _completedRun.CourseID is 0 ||
