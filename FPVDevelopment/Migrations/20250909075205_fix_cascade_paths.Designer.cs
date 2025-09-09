@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FPVDevelopment.Migrations
 {
     [DbContext(typeof(FPVDbContext))]
-    [Migration("20250909073700_add_multi_sim_support")]
-    partial class add_multi_sim_support
+    [Migration("20250909075205_fix_cascade_paths")]
+    partial class fix_cascade_paths
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -201,7 +201,7 @@ namespace FPVDevelopment.Migrations
                     b.HasOne("FPVDevelopment.Components.Data.Models.Course", "Course")
                         .WithMany("CompletedRuns")
                         .HasForeignKey("CourseID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("FPVDevelopment.Components.Data.Models.Drone", "Drone")
@@ -228,12 +228,13 @@ namespace FPVDevelopment.Migrations
                     b.HasOne("FPVDevelopment.Components.Data.Models.Map", "Map")
                         .WithMany("Courses")
                         .HasForeignKey("MapID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("FPVDevelopment.Components.Data.Models.User", "User")
                         .WithMany("Courses")
-                        .HasForeignKey("UserID");
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Map");
 
@@ -262,12 +263,13 @@ namespace FPVDevelopment.Migrations
                     b.HasOne("FPVDevelopment.Components.Data.Models.Sim", "Sim")
                         .WithMany("Maps")
                         .HasForeignKey("SimID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("FPVDevelopment.Components.Data.Models.User", "User")
                         .WithMany("Maps")
-                        .HasForeignKey("UserID");
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Sim");
 

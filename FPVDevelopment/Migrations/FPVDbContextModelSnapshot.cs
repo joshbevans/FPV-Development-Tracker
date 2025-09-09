@@ -198,7 +198,7 @@ namespace FPVDevelopment.Migrations
                     b.HasOne("FPVDevelopment.Components.Data.Models.Course", "Course")
                         .WithMany("CompletedRuns")
                         .HasForeignKey("CourseID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("FPVDevelopment.Components.Data.Models.Drone", "Drone")
@@ -225,12 +225,13 @@ namespace FPVDevelopment.Migrations
                     b.HasOne("FPVDevelopment.Components.Data.Models.Map", "Map")
                         .WithMany("Courses")
                         .HasForeignKey("MapID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("FPVDevelopment.Components.Data.Models.User", "User")
                         .WithMany("Courses")
-                        .HasForeignKey("UserID");
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Map");
 
@@ -259,12 +260,13 @@ namespace FPVDevelopment.Migrations
                     b.HasOne("FPVDevelopment.Components.Data.Models.Sim", "Sim")
                         .WithMany("Maps")
                         .HasForeignKey("SimID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("FPVDevelopment.Components.Data.Models.User", "User")
                         .WithMany("Maps")
-                        .HasForeignKey("UserID");
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Sim");
 
