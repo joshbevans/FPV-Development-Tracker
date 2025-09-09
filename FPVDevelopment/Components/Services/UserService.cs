@@ -22,8 +22,13 @@ namespace FPVDevelopment.Components.Services
 
                 if (!context.Users.Any())
                     throw new ArgumentNullException(nameof(User));
-
-                return context.Users.FirstOrDefault();
+                
+                if (username == "melon")
+                    return context.Users.FirstOrDefault(u => u.Username == "melon");
+                if (username == "melonBasic")
+                    return context.Users.FirstOrDefault(u => u.Username == "melonBasic");
+                
+                return null;
             }
         }
     }
