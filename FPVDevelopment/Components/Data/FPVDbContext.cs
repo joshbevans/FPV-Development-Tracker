@@ -17,5 +17,6 @@ namespace FPVDevelopment.Components.Data
         public DbSet<Drone> Drones { get; set; }
         public DbSet<Map> Maps { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Sim> Sims { get; set; }
     }
 }
