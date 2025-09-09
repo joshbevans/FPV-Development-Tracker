@@ -75,9 +75,14 @@ namespace FPVDevelopment.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int?>("UserID")
+                        .HasColumnType("int");
+
                     b.HasKey("ID");
 
                     b.HasIndex("MapID");
+
+                    b.HasIndex("UserID");
 
                     b.ToTable("Courses");
                 });
@@ -95,6 +100,9 @@ namespace FPVDevelopment.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<int>("SimID")
+                        .HasColumnType("int");
+
                     b.Property<int>("Size")
                         .HasColumnType("int");
 
@@ -102,6 +110,8 @@ namespace FPVDevelopment.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("SimID");
 
                     b.HasIndex("UserID");
 
@@ -121,9 +131,36 @@ namespace FPVDevelopment.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("SimID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserID")
+                        .HasColumnType("int");
+
                     b.HasKey("ID");
 
+                    b.HasIndex("SimID");
+
+                    b.HasIndex("UserID");
+
                     b.ToTable("Maps");
+                });
+
+            modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Sim", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Sims");
                 });
 
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.User", b =>
@@ -142,6 +179,9 @@ namespace FPVDevelopment.Migrations
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserLevel")
+                        .HasColumnType("int");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -188,14 +228,43 @@ namespace FPVDevelopment.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("FPVDevelopment.Components.Data.Models.User", "User")
+                        .WithMany("Courses")
+                        .HasForeignKey("UserID");
+
                     b.Navigation("Map");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Drone", b =>
                 {
+                    b.HasOne("FPVDevelopment.Components.Data.Models.Sim", null)
+                        .WithMany("Drones")
+                        .HasForeignKey("SimID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("FPVDevelopment.Components.Data.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserID");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Map", b =>
+                {
+                    b.HasOne("FPVDevelopment.Components.Data.Models.Sim", "Sim")
+                        .WithMany("Maps")
+                        .HasForeignKey("SimID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FPVDevelopment.Components.Data.Models.User", "User")
+                        .WithMany("Maps")
+                        .HasForeignKey("UserID");
+
+                    b.Navigation("Sim");
 
                     b.Navigation("User");
                 });
@@ -215,9 +284,20 @@ namespace FPVDevelopment.Migrations
                     b.Navigation("Courses");
                 });
 
+            modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Sim", b =>
+                {
+                    b.Navigation("Drones");
+
+                    b.Navigation("Maps");
+                });
+
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.User", b =>
                 {
                     b.Navigation("CompletedRuns");
+
+                    b.Navigation("Courses");
+
+                    b.Navigation("Maps");
                 });
 #pragma warning restore 612, 618
         }

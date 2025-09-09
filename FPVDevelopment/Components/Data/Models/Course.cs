@@ -11,7 +11,9 @@ public class Course
     public string Name { get; set; }
     public Difficulty Difficulty { get; set; } = Difficulty.Easy;
     public int MapID { get; set; }
+    public int? UserID { get; set; }
     
     public Map Map { get; set; }
+    public User? User { get; set; }
     public ICollection<CompletedRun> CompletedRuns { get; set; } = new List<CompletedRun>();
 }
