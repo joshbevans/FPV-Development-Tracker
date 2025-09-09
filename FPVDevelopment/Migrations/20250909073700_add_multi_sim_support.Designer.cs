@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FPVDevelopment.Migrations
 {
     [DbContext(typeof(FPVDbContext))]
-    [Migration("20250909063812_add_multi_sim_support")]
+    [Migration("20250909073700_add_multi_sim_support")]
     partial class add_multi_sim_support
     {
         /// <inheritdoc />
@@ -242,7 +242,7 @@ namespace FPVDevelopment.Migrations
 
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Drone", b =>
                 {
-                    b.HasOne("FPVDevelopment.Components.Data.Models.Sim", null)
+                    b.HasOne("FPVDevelopment.Components.Data.Models.Sim", "Sim")
                         .WithMany("Drones")
                         .HasForeignKey("SimID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -251,6 +251,8 @@ namespace FPVDevelopment.Migrations
                     b.HasOne("FPVDevelopment.Components.Data.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserID");
+
+                    b.Navigation("Sim");
 
                     b.Navigation("User");
                 });
