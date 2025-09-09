@@ -43,6 +43,7 @@ namespace FPVDevelopment.Components.Services
             {
                 return await context.Drones
                     .Include(d => d.User)
+                    .Include(d => d.Sim)
                     .Where(d => d.User == null || d.User.ID == user.ID)
                     .ToListAsync();
             }

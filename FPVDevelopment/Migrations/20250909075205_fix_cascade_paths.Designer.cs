@@ -4,6 +4,7 @@ using FPVDevelopment.Components.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FPVDevelopment.Migrations
 {
     [DbContext(typeof(FPVDbContext))]
-    partial class FPVDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250909075205_fix_cascade_paths")]
+    partial class fix_cascade_paths
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

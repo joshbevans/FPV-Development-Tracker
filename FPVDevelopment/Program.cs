@@ -20,6 +20,7 @@ builder.Services.AddSingleton<DroneService>();
 builder.Services.AddSingleton<MapService>();
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<CourseService>();
+builder.Services.AddSingleton<SimService>();
 
 builder.Services.AddSingleton<CurrentUser>();
 builder.Services.AddMudServices();

@@ -1,6 +1,7 @@
 ﻿@page "/AddDrone"
 @inject DroneService DroneService;
 @inject CurrentUser CurrentUser;
+@inject SimService SimService;
 @inject ISnackbar Snackbar
 @rendermode InteractiveServer
 
@@ -13,6 +14,13 @@
                 </MudCardHeader>
                 <MudCardContent Class="p-2 pt-1">
                     <MudStack Spacing="4">
+                        <MudSelect  @bind-Value="@_sim.ID" Label="Select a Sim">
+                            @foreach (var sim in _simList
+                                          .OrderBy(s => s.Name))
+                            {
+                                <MudSelectItem Value="@sim.ID">@sim.Name</MudSelectItem>
+                            }
+                        </MudSelect>
                         <MudTextField Label="Drone Name" HelperText="Max. 20 characters"
                                       @bind-Value="@_drone.Name"></MudTextField>
                         <div class="d-flex" style="width:100%">
@@ -44,16 +52,24 @@
     private readonly Drone _drone = new Drone();
 
     private bool _isCustom = true;
+    private IList<Sim> _simList = [];
+    private Sim _sim = new Sim();
 
     private bool IsSubmitDisabled =>
         string.IsNullOrWhiteSpace(_drone.Name);
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _simList = await SimService.GetSims();
+    }
 
     private async Task HandleSubmit(EditContext editContext)
     {
         var newDrone = new Drone
         {
             Name = _drone.Name,
-            Size = _drone.Size
+            Size = _drone.Size,
+            SimID = _sim.ID
         };
         
         if (_isCustom)

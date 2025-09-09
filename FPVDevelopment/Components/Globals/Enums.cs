@@ -24,6 +24,13 @@ namespace FPVDevelopment.Components.Globals
             Hard
         }
 
+        public enum UserLevel
+        {
+            User,
+            Staff,
+            Admin
+        }
+
         public enum DroneSize
         {
             [Description("3\"")]

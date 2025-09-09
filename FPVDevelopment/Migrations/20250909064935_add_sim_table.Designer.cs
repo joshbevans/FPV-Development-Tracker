@@ -4,6 +4,7 @@ using FPVDevelopment.Components.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FPVDevelopment.Migrations
 {
     [DbContext(typeof(FPVDbContext))]
-    partial class FPVDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250909064935_add_sim_table")]
+    partial class add_sim_table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,14 +78,9 @@ namespace FPVDevelopment.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("UserID")
-                        .HasColumnType("int");
-
                     b.HasKey("ID");
 
                     b.HasIndex("MapID");
-
-                    b.HasIndex("UserID");
 
                     b.ToTable("Courses");
                 });
@@ -100,7 +98,7 @@ namespace FPVDevelopment.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int>("SimID")
+                    b.Property<int?>("SimID")
                         .HasColumnType("int");
 
                     b.Property<int>("Size")
@@ -131,17 +129,12 @@ namespace FPVDevelopment.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("SimID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserID")
+                    b.Property<int?>("SimID")
                         .HasColumnType("int");
 
                     b.HasKey("ID");
 
                     b.HasIndex("SimID");
-
-                    b.HasIndex("UserID");
 
                     b.ToTable("Maps");
                 });
@@ -180,9 +173,6 @@ namespace FPVDevelopment.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserLevel")
-                        .HasColumnType("int");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -198,7 +188,7 @@ namespace FPVDevelopment.Migrations
                     b.HasOne("FPVDevelopment.Components.Data.Models.Course", "Course")
                         .WithMany("CompletedRuns")
                         .HasForeignKey("CourseID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("FPVDevelopment.Components.Data.Models.Drone", "Drone")
@@ -225,52 +215,30 @@ namespace FPVDevelopment.Migrations
                     b.HasOne("FPVDevelopment.Components.Data.Models.Map", "Map")
                         .WithMany("Courses")
                         .HasForeignKey("MapID")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FPVDevelopment.Components.Data.Models.User", "User")
-                        .WithMany("Courses")
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.Navigation("Map");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Drone", b =>
                 {
-                    b.HasOne("FPVDevelopment.Components.Data.Models.Sim", "Sim")
+                    b.HasOne("FPVDevelopment.Components.Data.Models.Sim", null)
                         .WithMany("Drones")
-                        .HasForeignKey("SimID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SimID");
 
                     b.HasOne("FPVDevelopment.Components.Data.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserID");
-
-                    b.Navigation("Sim");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Map", b =>
                 {
-                    b.HasOne("FPVDevelopment.Components.Data.Models.Sim", "Sim")
+                    b.HasOne("FPVDevelopment.Components.Data.Models.Sim", null)
                         .WithMany("Maps")
-                        .HasForeignKey("SimID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("FPVDevelopment.Components.Data.Models.User", "User")
-                        .WithMany("Maps")
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Sim");
-
-                    b.Navigation("User");
+                        .HasForeignKey("SimID");
                 });
 
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.Course", b =>
@@ -298,10 +266,6 @@ namespace FPVDevelopment.Migrations
             modelBuilder.Entity("FPVDevelopment.Components.Data.Models.User", b =>
                 {
                     b.Navigation("CompletedRuns");
-
-                    b.Navigation("Courses");
-
-                    b.Navigation("Maps");
                 });
 #pragma warning restore 612, 618
         }
