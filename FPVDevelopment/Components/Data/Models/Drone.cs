@@ -14,6 +14,7 @@ namespace FPVDevelopment.Components.Data.Models
         
         
         public User? User { get; set; } = null;
+        public Sim Sim { get; set; }
         public DroneSize Size { get; set; } = DroneSize.SevenInch;
 
         public ICollection<CompletedRun> CompletedRuns {  get; set; } = new List<CompletedRun>();
