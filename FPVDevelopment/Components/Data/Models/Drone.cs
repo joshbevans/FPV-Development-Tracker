@@ -10,7 +10,7 @@ namespace FPVDevelopment.Components.Data.Models
         [StringLength(20)]
         public string Name { get; set; }
         public int? UserID { get; set; }
-        public int SimID { get; set; }
+        public int SimID { get; set; } = 1;
         
         
         public User? User { get; set; } = null;
