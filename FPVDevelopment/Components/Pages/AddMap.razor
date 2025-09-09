@@ -1,5 +1,6 @@
 ﻿@page "/AddMap"
 @inject MapService MapService;
+@inject SimService SimService;
 @inject ISnackbar Snackbar
 @rendermode InteractiveServer
 
@@ -12,6 +13,13 @@
                 </MudCardHeader>
                 <MudCardContent Class="p-2 pt-1">
                     <MudStack Spacing="4">
+                        <MudSelect  @bind-Value="@_sim.ID" Label="Select a Sim">
+                            @foreach (var sim in _simList
+                                          .OrderBy(s => s.Name))
+                            {
+                                <MudSelectItem Value="@sim.ID">@sim.Name</MudSelectItem>
+                            }
+                        </MudSelect>
                         <MudTextField Label="Map Name" HelperText="Max. 50 characters"
                                       @bind-Value="@_map.Name"></MudTextField>
                     </MudStack>
@@ -33,14 +41,23 @@
 @code {
     private readonly Map _map = new Map();
 
+    private IList<Sim> _simList = [];
+    private Sim _sim = new Sim();
+    
     private bool IsSubmitDisabled =>
         string.IsNullOrWhiteSpace(_map.Name);
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _simList = await SimService.GetSims();
+    }
 
     private async Task HandleSubmit(EditContext editContext)
     {
         var newMap = new Map
         {
             Name = _map.Name,
+            SimID = _sim.ID
         };
         
         var flag = await MapService.AddMap(newMap);
