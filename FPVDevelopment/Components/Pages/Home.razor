@@ -12,8 +12,17 @@
         Style="width: 200px;"
         Variant="Variant.Filled"
         Color="Color.Primary"
-        @onclick="HandleLoginUser">
-        Login
+        @onclick='() => HandleLoginUser("melon")'>
+        Login Admin
+    </MudButton>
+    <MudButton
+        hidden="@IsUserLoggedIn"
+        FullWidth="false"
+        Style="width: 200px;"
+        Variant="Variant.Filled"
+        Color="Color.Primary"
+        @onclick='() => HandleLoginUser("melonBasic")'>
+        Login User
     </MudButton>
 </MudStack>
 
@@ -37,10 +46,10 @@
     private bool IsUserLoggedIn =>
         CurrentUser.User is not null;
         
-    private async Task HandleLoginUser()
+    private async Task HandleLoginUser(string userSelect)
     {
-        CurrentUser.SetCurrentUser(await UserService.Login("user", "pass"));
-        if (CurrentUser is not null)
+        CurrentUser.SetCurrentUser(await UserService.Login(userSelect, "pass"));
+        if (CurrentUser.User is not null)
         {
             Snackbar.Add("Login Successful!", Severity.Success);
         }

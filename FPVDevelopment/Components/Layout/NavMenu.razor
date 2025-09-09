@@ -9,7 +9,7 @@
     <MudNavLink Href="/Analytics" Icon="@Icons.Material.Filled.Analytics" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">Analytics</MudNavLink>
     <MudDivider/>
     <MudNavLink Href="/AddCompletedRun" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">Add Completed Run</MudNavLink>
-    <MudNavLink Href="/AddMap" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">Add Map</MudNavLink>
+    <MudNavLink Href="/AddMap" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@HideAdminOption">Add Map</MudNavLink>
     <MudNavLink Href="/AddCourse" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">Add Course</MudNavLink>
     <MudNavLink Href="/AddDrone" Icon="@Icons.Material.Filled.Add" Match="NavLinkMatch.Prefix" hidden="@IsNavHidden">Add Drone</MudNavLink>
 </MudNavMenu>
@@ -33,4 +33,8 @@
 
     private bool IsNavHidden =>
         CurrentUser.User is null;
+
+    private bool HideAdminOption =>
+        CurrentUser.User is not null ? CurrentUser.User.UserLevel != UserLevel.Admin : true;
+
 }
