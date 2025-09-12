@@ -2,24 +2,6 @@
 @inject CompletedRunService CompletedRunService
 @inject CurrentUser CurrentUser
 
-@if (_configByDate != null)
-{
-    <MudCard Style="width:100%; margin-bottom:20px;">
-        <MudCardHeader>
-            <MudText Typo="Typo.h6">Progression Over Time</MudText>
-        </MudCardHeader>
-        <MudCardContent>
-            <div style="width:100%;">
-                <Chart Config="_configByDate"/>
-            </div>
-        </MudCardContent>
-    </MudCard>
-}
-else
-{
-    <p>No data available.</p>
-}
-
 @if (_configByAttempt != null)
 {
     <MudCard Style="width:100%; margin-bottom:20px;">
@@ -29,6 +11,24 @@ else
         <MudCardContent>
             <div style="width:100%;">
                 <Chart Config="_configByAttempt"/>
+            </div>
+        </MudCardContent>
+    </MudCard>
+}
+else
+{
+    <p>No data available.</p>
+}
+
+@if (_configByDate != null)
+{
+    <MudCard Style="width:100%; margin-bottom:20px;">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Progression Over Time</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <div style="width:100%;">
+                <Chart Config="_configByDate"/>
             </div>
         </MudCardContent>
     </MudCard>
